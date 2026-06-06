@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>العهد سولار — CRM الذكي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- DOMPurify: sanitizes dynamic content rendered via innerHTML (used in showQStatus) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM — العهد سولار CRM Pro
+═══════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#F5C842;--gold2:#FFE566;--gold3:#D4A017;
+  --orange:#FF7A1A;--orange2:#E85D00;
+  --bg-base:#070B14;--bg-surface:#0C1220;--bg-elevated:#111927;--bg-overlay:#162034;
+  --glass-bg:rgba(255,255,255,0.04);--glass-bg2:rgba(255,255,255,0.07);
+  --glass-border:rgba(255,255,255,0.08);--glass-border2:rgba(255,255,255,0.13);
+  --green:#3DD68C;--green2:#1fa866;--red:#FF5252;--blue:#4C9BFF;--blue2:#1565c0;--purple:#9B59FF;
+  --text-primary:#EEF0F8;--text-secondary:#8A9BB5;--text-muted:#4A5568;
+  --sidebar-w:240px;--sidebar-collapsed:64px;
+  --r-sm:8px;--r-md:12px;--r-lg:16px;--r-xl:20px;--r-2xl:24px;
+  --shadow-sm:0 2px 8px rgba(0,0,0,0.3);--shadow-md:0 8px 32px rgba(0,0,0,0.4);
+  --shadow-lg:0 16px 64px rgba(0,0,0,0.5);
+  --mode-bg:var(--bg-base);--mode-surface:var(--bg-surface);--mode-elevated:var(--bg-elevated);
+  --mode-text:var(--text-primary);--mode-text-2:var(--text-secondary);
+  --mode-border:var(--glass-border);--mode-card:var(--glass-bg);
+  --ease:cubic-bezier(0.4,0,0.2,1);--spring:cubic-bezier(0.34,1.56,0.64,1);
+}
+body.light{
+  --mode-bg:#F0F4FA;--mode-surface:#FFFFFF;--mode-elevated:#F8FAFD;
+  --mode-text:#0F1724;--mode-text-2:#4A5568;--mode-border:rgba(0,0,0,0.08);--mode-card:rgba(255,255,255,0.8);
+  --glass-border:rgba(0,0,0,0.08);--glass-border2:rgba(0,0,0,0.12);
+  --glass-bg:rgba(255,255,255,0.7);--glass-bg2:rgba(255,255,255,0.9);
+  --text-primary:#0F1724;--text-secondary:#4A5568;--text-muted:#94A3B8;
+  --bg-base:#F0F4FA;--bg-surface:#FFFFFF;--bg-elevated:#F8FAFD;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Cairo',sans-serif;background:var(--mode-bg);color:var(--mode-text);min-height:100vh;direction:rtl;overflow-x:hidden;transition:background 0.3s var(--ease),color 0.3s var(--ease)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--glass-border2);border-radius:99px}
+::-webkit-scrollbar-thumb:hover{background:var(--gold3)}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--bg-base);overflow:hidden}
+.login-bg{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% -10%,rgba(255,122,26,0.18) 0%,transparent 70%),radial-gradient(ellipse 40% 40% at 80% 80%,rgba(245,200,66,0.06) 0%,transparent 60%)}
+.login-grid-bg{position:absolute;inset:0;opacity:0.03;background-image:linear-gradient(rgba(255,255,255,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.5) 1px,transparent 1px);background-size:40px 40px}
+.login-particles{position:absolute;inset:0;pointer-events:none}
+.login-particles span{position:absolute;border-radius:50%;background:var(--gold);opacity:0;animation:float-up var(--dur,8s) var(--delay,0s) infinite ease-in-out}
+@keyframes float-up{0%{opacity:0;transform:translateY(0) scale(0)}20%{opacity:0.4}80%{opacity:0.1}100%{opacity:0;transform:translateY(-100px) scale(1)}}
+.login-box{position:relative;z-index:2;width:100%;max-width:440px;padding:0 20px;animation:fadeInUp 0.6s var(--spring) both}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.login-card{background:var(--glass-bg2);border:1px solid var(--glass-border2);border-radius:var(--r-2xl);padding:40px 32px;backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);box-shadow:var(--shadow-lg),inset 0 1px 0 rgba(255,255,255,0.08)}
+.login-logo{text-align:center;margin-bottom:32px}
+.login-sun-wrap{display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;background:linear-gradient(135deg,var(--orange),var(--gold));border-radius:20px;box-shadow:0 0 60px rgba(255,122,26,0.4),0 8px 24px rgba(0,0,0,0.3);margin-bottom:16px;animation:logo-pulse 3s ease-in-out infinite}
+@keyframes logo-pulse{0%,100%{box-shadow:0 0 40px rgba(255,122,26,0.3),0 8px 24px rgba(0,0,0,0.3)}50%{box-shadow:0 0 80px rgba(255,122,26,0.5),0 8px 24px rgba(0,0,0,0.3)}}
+.login-sun-wrap svg{width:36px;height:36px;fill:var(--bg-base)}
+.login-brand{font-family:'Tajawal',sans-serif;font-size:26px;font-weight:900;color:var(--gold);letter-spacing:-0.5px}
+.login-brand-en{color:var(--text-secondary);font-size:11px;letter-spacing:2px;margin-top:2px;text-transform:uppercase}
+.login-greeting{font-family:'Tajawal',sans-serif;font-size:19px;font-weight:700;color:var(--text-primary);text-align:center;margin-bottom:4px}
+.login-greeting span{color:var(--gold)}
+.login-hint{color:var(--text-secondary);font-size:12px;text-align:center;margin-bottom:28px}
+.login-field{margin-bottom:16px}
+.login-field label{display:flex;align-items:center;gap:6px;color:var(--text-secondary);font-size:11.5px;margin-bottom:6px}
+.lf-wrap{position:relative}
+.lf-wrap svg.lf-icon{position:absolute;right:13px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted);pointer-events:none;transition:color 0.2s}
+.login-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--glass-border2);border-radius:var(--r-md);color:var(--text-primary);padding:12px 42px 12px 16px;font-size:13.5px;font-family:'Cairo',sans-serif;outline:none;transition:all 0.22s var(--ease)}
+.login-input::placeholder{color:var(--text-muted)}
+.login-input:focus{border-color:var(--gold);background:rgba(245,200,66,0.04);box-shadow:0 0 0 3px rgba(245,200,66,0.12)}
+.login-input.rtl-input{direction:rtl;padding-right:42px;padding-left:16px}
+.login-input.ltr-input{direction:ltr;padding-right:42px;padding-left:16px}
+.login-btn{width:100%;margin-top:8px;background:linear-gradient(135deg,var(--orange),var(--gold));border:none;border-radius:var(--r-md);color:var(--bg-base);padding:14px;font-size:14.5px;font-weight:800;font-family:'Tajawal',sans-serif;cursor:pointer;transition:all 0.2s var(--ease);position:relative;overflow:hidden}
+.login-btn:hover::after{background:rgba(255,255,255,0.1)}
+.login-btn::after{content:'';position:absolute;inset:0;background:rgba(255,255,255,0);transition:background 0.2s}
+.login-btn:active{transform:scale(0.98)}
+.login-err{display:flex;align-items:center;gap:6px;color:var(--red);font-size:11.5px;text-align:center;margin-top:10px;min-height:20px;justify-content:center}
+.login-footer{text-align:center;color:var(--text-muted);font-size:10.5px;margin-top:24px;letter-spacing:0.3px}
+
+/* APP LAYOUT */
+#appScreen{display:none}
+.sidebar{position:fixed;top:0;right:0;width:var(--sidebar-w);height:100vh;background:var(--mode-surface);border-left:1px solid var(--mode-border);display:flex;flex-direction:column;z-index:300;transition:width 0.3s var(--ease),transform 0.3s var(--ease);overflow:hidden}
+.sidebar.collapsed{width:var(--sidebar-collapsed)}
+.sidebar.collapsed .sb-label,.sidebar.collapsed .sb-section-label,.sidebar.collapsed .sb-logo-text,.sidebar.collapsed .sb-user-info,.sidebar.collapsed .sb-badge{opacity:0;width:0;overflow:hidden;pointer-events:none}
+.sb-header{display:flex;align-items:center;gap:12px;padding:20px 16px;border-bottom:1px solid var(--mode-border);min-height:72px;flex-shrink:0}
+.sb-logo-icon{width:38px;height:38px;flex-shrink:0;background:linear-gradient(135deg,var(--orange),var(--gold));border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(255,122,26,0.3);transition:transform 0.3s var(--spring)}
+.sb-logo-icon:hover{transform:scale(1.05) rotate(-3deg)}
+.sb-logo-icon svg{width:20px;height:20px;fill:white}
+.sb-logo-text{flex:1;overflow:hidden}
+.sb-logo-name{font-family:'Tajawal',sans-serif;font-size:14px;font-weight:800;color:var(--gold);white-space:nowrap}
+.sb-logo-sub{color:var(--text-secondary);font-size:9.5px;letter-spacing:1px;white-space:nowrap}
+.sb-toggle{width:28px;height:28px;flex-shrink:0;background:var(--glass-bg2);border:1px solid var(--mode-border);border-radius:var(--r-sm);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:all 0.2s;margin-right:auto}
+.sb-toggle:hover{color:var(--gold);border-color:var(--gold)}
+.sb-toggle svg{width:14px;height:14px;transition:transform 0.3s}
+.sidebar.collapsed .sb-toggle svg{transform:rotate(180deg)}
+.sb-nav{flex:1;overflow-y:auto;padding:12px 10px}
+.sb-section-label{color:var(--text-muted);font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;padding:10px 8px 6px;white-space:nowrap}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-md);cursor:pointer;font-size:12.5px;color:var(--text-secondary);transition:all 0.18s var(--ease);border:1px solid transparent;margin-bottom:2px;position:relative;white-space:nowrap}
+.sb-item:hover{background:var(--glass-bg2);color:var(--text-primary);border-color:var(--glass-border)}
+.sb-item.active{background:linear-gradient(135deg,rgba(255,122,26,0.15),rgba(245,200,66,0.1));color:var(--gold);border-color:rgba(245,200,66,0.2);font-weight:700}
+.sb-item.active::before{content:'';position:absolute;right:0;top:20%;bottom:20%;width:3px;background:var(--gold);border-radius:2px 0 0 2px}
+.sb-item svg{width:18px;height:18px;flex-shrink:0}
+.sb-badge{margin-right:auto;background:var(--gold);color:var(--bg-base);border-radius:20px;padding:1px 7px;font-size:9.5px;font-weight:700}
+.sb-badge.red{background:var(--red)}
+.sb-footer{padding:12px 10px;border-top:1px solid var(--mode-border);flex-shrink:0}
+.conn-status{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:var(--r-sm);background:rgba(61,214,140,0.08);border:1px solid rgba(61,214,140,0.18);font-size:10.5px;color:var(--green);margin-bottom:8px}
+.conn-status.offline{background:rgba(255,82,82,0.08);border-color:rgba(255,82,82,0.18);color:var(--red)}
+.conn-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulse 2s infinite}
+.conn-status.offline .conn-dot{background:var(--red);animation:none}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+.sb-user{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r-md);background:var(--glass-bg);border:1px solid var(--glass-border);cursor:pointer;transition:all 0.2s;margin-bottom:6px}
+.sb-avatar{width:32px;height:32px;flex-shrink:0;background:linear-gradient(135deg,var(--orange),var(--gold));border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:white;font-family:'Tajawal',sans-serif}
+.sb-user-info{flex:1;overflow:hidden}
+.sb-username{font-size:12px;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-role{font-size:9.5px;color:var(--text-secondary)}
+.sb-actions{display:flex;gap:6px}
+.sb-action-btn{flex:1;padding:8px 6px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--r-sm);cursor:pointer;color:var(--text-secondary);font-size:10px;display:flex;align-items:center;justify-content:center;gap:4px;transition:all 0.2s;font-family:'Cairo',sans-serif}
+.sb-action-btn:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,200,66,0.06)}
+.sb-action-btn svg{width:14px;height:14px}
+.sidebar.collapsed .sb-action-btn span{display:none}
+.topbar{position:fixed;top:0;left:0;right:var(--sidebar-w);height:62px;background:var(--mode-surface);border-bottom:1px solid var(--mode-border);display:flex;align-items:center;padding:0 20px;gap:14px;z-index:200;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);transition:right 0.3s var(--ease)}
+.sidebar.collapsed~.main-wrap .topbar{right:var(--sidebar-collapsed)}
+.topbar-breadcrumb{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary)}
+.topbar-breadcrumb .page-name{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;color:var(--text-primary)}
+.topbar-breadcrumb svg{width:14px;height:14px;opacity:0.4}
+.topbar-spacer{flex:1}
+.topbar-actions{display:flex;align-items:center;gap:8px}
+.icon-btn-top{width:36px;height:36px;background:var(--glass-bg);border:1px solid var(--mode-border);border-radius:var(--r-md);cursor:pointer;color:var(--text-secondary);display:flex;align-items:center;justify-content:center;transition:all 0.18s var(--ease)}
+.icon-btn-top svg{width:17px;height:17px}
+.icon-btn-top:hover{background:var(--glass-bg2);color:var(--gold);border-color:rgba(245,200,66,0.3);transform:translateY(-1px)}
+.icon-btn-top.spinning svg{animation:spin 0.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.mode-toggle{background:var(--glass-bg);border:1px solid var(--mode-border);border-radius:var(--r-md);padding:6px 12px;cursor:pointer;font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;transition:all 0.2s;font-family:'Cairo',sans-serif}
+.mode-toggle svg{width:15px;height:15px}
+.mode-toggle:hover{border-color:var(--gold);color:var(--gold)}
+#loadingBar{position:fixed;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--orange),var(--gold),var(--orange));background-size:200% 100%;z-index:9999;transform:scaleX(0);transform-origin:right;transition:transform 0.4s var(--ease)}
+#loadingBar.active{transform:scaleX(1);animation:loading-shimmer 1.5s linear infinite}
+@keyframes loading-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.main-wrap{margin-right:var(--sidebar-w);padding-top:62px;min-height:100vh;transition:margin-right 0.3s var(--ease)}
+.sidebar.collapsed~.main-wrap{margin-right:var(--sidebar-collapsed)}
+.page{display:none;max-width:980px;margin:0 auto;padding:24px 20px;animation:fadeUp 0.28s var(--ease) both}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--r-xl);padding:18px 20px;margin-bottom:14px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);transition:border-color 0.2s,box-shadow 0.2s;position:relative;overflow:hidden}
+body.light .card{background:rgba(255,255,255,0.85);box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.card::before{content:'';position:absolute;top:0;right:0;left:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.1),transparent);pointer-events:none}
+.card:hover{border-color:var(--glass-border2);box-shadow:var(--shadow-sm)}
+.card-title{font-family:'Tajawal',sans-serif;color:var(--text-primary);font-size:14px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.ct-icon{width:28px;height:28px;background:linear-gradient(135deg,rgba(255,122,26,0.15),rgba(245,200,66,0.1));border:1px solid rgba(245,200,66,0.15);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ct-icon svg{width:15px;height:15px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{color:var(--text-secondary);font-size:11px;display:flex;align-items:center;gap:5px}
+.form-input{background:var(--glass-bg2);border:1px solid var(--glass-border);border-radius:var(--r-md);color:var(--text-primary);padding:10px 13px;font-size:13px;font-family:'Cairo',sans-serif;outline:none;transition:all 0.22s var(--ease)}
+body.light .form-input{background:#f8fafd;border-color:#e2e8f0}
+.form-input::placeholder{color:var(--text-muted)}
+.form-input:focus{border-color:var(--gold);background:rgba(245,200,66,0.04);box-shadow:0 0 0 3px rgba(245,200,66,0.1)}
+select.form-input option{background:var(--bg-surface)}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 16px;border-radius:var(--r-md);font-size:12.5px;font-family:'Cairo',sans-serif;font-weight:600;cursor:pointer;border:1px solid var(--glass-border);background:var(--glass-bg2);color:var(--text-secondary);transition:all 0.18s var(--ease);white-space:nowrap}
+.btn:hover{background:var(--glass-bg2);border-color:var(--glass-border2);color:var(--text-primary)}
+.btn svg{width:15px;height:15px;flex-shrink:0}
+.btn-primary{background:linear-gradient(135deg,rgba(255,122,26,0.2),rgba(245,200,66,0.15));border-color:rgba(245,200,66,0.3);color:var(--gold)}
+.btn-primary:hover{background:linear-gradient(135deg,rgba(255,122,26,0.3),rgba(245,200,66,0.25));border-color:var(--gold);box-shadow:0 4px 16px rgba(245,200,66,0.15)}
+.btn-success{background:rgba(61,214,140,0.12);border-color:rgba(61,214,140,0.3);color:var(--green)}
+.btn-success:hover{background:rgba(61,214,140,0.2);box-shadow:0 4px 16px rgba(61,214,140,0.15)}
+.btn-danger{background:rgba(255,82,82,0.1);border-color:rgba(255,82,82,0.25);color:var(--red)}
+.btn-danger:hover{background:rgba(255,82,82,0.2)}
+.btn-pdf{background:rgba(255,82,82,0.1);border-color:rgba(255,82,82,0.25);color:#FF8080}
+.btn-wa{background:rgba(37,211,102,0.1);border-color:rgba(37,211,102,0.25);color:#25D366}
+.btn-share{background:rgba(76,155,255,0.1);border-color:rgba(76,155,255,0.25);color:var(--blue)}
+.btn-blue{background:rgba(76,155,255,0.12);border-color:rgba(76,155,255,0.3);color:var(--blue)}
+.btn-blue:hover{background:rgba(76,155,255,0.22)}
+.action-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.dash-welcome{background:linear-gradient(135deg,var(--bg-elevated),var(--bg-overlay));border:1px solid var(--glass-border);border-radius:var(--r-2xl);padding:28px;margin-bottom:20px;position:relative;overflow:hidden}
+body.light .dash-welcome{background:linear-gradient(135deg,#fff,#f0f4ff)}
+.dash-welcome::before{content:'';position:absolute;top:-60px;left:-60px;width:250px;height:250px;background:radial-gradient(circle,rgba(255,122,26,0.12) 0%,transparent 70%);pointer-events:none}
+.dash-welcome-title{font-family:'Tajawal',sans-serif;font-size:22px;font-weight:900;color:var(--text-primary);margin-bottom:4px}
+.dash-welcome-title span{color:var(--gold)}
+.dash-welcome-sub{color:var(--text-secondary);font-size:13px}
+.dash-welcome-right{position:absolute;left:28px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.dash-date-badge{background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:20px;padding:4px 14px;color:var(--gold);font-size:11.5px;font-weight:600}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.dash-stat-card{background:var(--glass-bg2);border:1px solid var(--glass-border);border-radius:var(--r-xl);padding:20px 18px;position:relative;overflow:hidden;transition:all 0.22s var(--ease);cursor:default}
+body.light .dash-stat-card{background:white;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.dash-stat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+.dash-stat-card::before{content:'';position:absolute;top:0;right:0;width:60%;height:60%;background:radial-gradient(ellipse at top right,var(--stat-color,rgba(245,200,66,0.06)) 0%,transparent 70%);pointer-events:none}
+.dash-stat-icon{width:42px;height:42px;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;margin-bottom:14px;background:var(--stat-bg,rgba(245,200,66,0.1))}
+.dash-stat-icon svg{width:22px;height:22px}
+.dash-stat-value{font-family:'Tajawal',sans-serif;font-size:24px;font-weight:900;color:var(--text-primary);line-height:1;margin-bottom:4px}
+.dash-stat-label{color:var(--text-secondary);font-size:11.5px}
+.dash-quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.quick-action{background:var(--glass-bg2);border:1px solid var(--glass-border);border-radius:var(--r-xl);padding:22px 20px;cursor:pointer;transition:all 0.22s var(--ease);display:flex;align-items:center;gap:16px;text-align:right}
+body.light .quick-action{background:white;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+.quick-action:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:rgba(245,200,66,0.3)}
+.qa-icon{width:48px;height:48px;flex-shrink:0;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center}
+.qa-icon svg{width:26px;height:26px}
+.qa-title{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.qa-sub{color:var(--text-secondary);font-size:11.5px}
+.page-header{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--mode-border)}
+.page-header h1{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:800;color:var(--text-primary);margin-bottom:4px}
+.page-header p{color:var(--text-secondary);font-size:12.5px}
+.status-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;white-space:nowrap}
+.status-new{background:rgba(76,155,255,0.12);color:var(--blue);border:1px solid rgba(76,155,255,0.25)}
+.status-followup{background:rgba(245,200,66,0.12);color:var(--gold);border:1px solid rgba(245,200,66,0.25)}
+.status-interested{background:rgba(155,89,255,0.12);color:var(--purple);border:1px solid rgba(155,89,255,0.25)}
+.status-negotiation{background:rgba(255,122,26,0.12);color:var(--orange);border:1px solid rgba(255,122,26,0.25)}
+.status-sold{background:rgba(61,214,140,0.12);color:var(--green);border:1px solid rgba(61,214,140,0.25)}
+.status-rejected{background:rgba(255,82,82,0.1);color:var(--red);border:1px solid rgba(255,82,82,0.25)}
+.crm-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.crm-search{flex:1;min-width:200px;background:var(--glass-bg2);border:1px solid var(--glass-border);border-radius:var(--r-md);color:var(--text-primary);padding:10px 13px 10px 36px;font-size:12.5px;font-family:'Cairo',sans-serif;outline:none;transition:all 0.22s var(--ease)}
+.crm-search:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,200,66,0.1)}
+.crm-search-wrap{position:relative;flex:1;min-width:200px}
+.crm-search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;color:var(--text-muted)}
+.crm-filter-select{background:var(--glass-bg2);border:1px solid var(--glass-border);border-radius:var(--r-md);color:var(--text-primary);padding:9px 12px;font-size:12px;font-family:'Cairo',sans-serif;outline:none;cursor:pointer;transition:all 0.2s}
+.crm-filter-select:focus{border-color:var(--gold)}
+body.light .crm-search,body.light .crm-filter-select{background:#f8fafd;border-color:#e2e8f0}
+.clients-table-wrap{overflow-x:auto}
+.clients-table{width:100%;border-collapse:collapse;font-size:12px}
+.clients-table th{background:var(--glass-bg);color:var(--text-secondary);font-weight:700;padding:10px 13px;text-align:right;border-bottom:1px solid var(--glass-border);white-space:nowrap}
+.clients-table td{padding:11px 13px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text-primary);vertical-align:middle}
+.clients-table tr:hover td{background:var(--glass-bg)}
+.clients-table tr:last-child td{border-bottom:none}
+body.light .clients-table th{background:#f8fafd}
+body.light .clients-table td{border-bottom:1px solid #f0f4fa}
+.client-name-cell{display:flex;align-items:center;gap:10px;cursor:pointer}
+.client-avatar{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--orange),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Tajawal',sans-serif;font-weight:900;font-size:13px;color:white;flex-shrink:0}
+.client-name-text{font-weight:700;color:var(--text-primary)}
+.client-phone-text{font-size:10px;color:var(--text-secondary);margin-top:2px}
+.table-actions{display:flex;gap:5px}
+.tbl-btn{width:28px;height:28px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s}
+.tbl-btn svg{width:13px;height:13px}
+.tbl-btn:hover{border-color:var(--gold);color:var(--gold)}
+.tbl-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.tbl-btn.green:hover{border-color:var(--green);color:var(--green)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-state svg{width:52px;height:52px;margin:0 auto 14px;display:block;opacity:0.3}
+.empty-state-title{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;color:var(--text-secondary);margin-bottom:6px}
+.client-hero{background:linear-gradient(135deg,var(--bg-elevated),var(--bg-overlay));border:1px solid var(--glass-border);border-radius:var(--r-2xl);padding:24px;margin-bottom:16px;display:flex;align-items:center;gap:20px;position:relative;overflow:hidden}
+body.light .client-hero{background:linear-gradient(135deg,#fff,#f0f4ff)}
+.client-hero::before{content:'';position:absolute;top:-60px;left:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(255,122,26,0.1) 0%,transparent 70%)}
+.hero-avatar{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,var(--orange),var(--gold));display:flex;align-items:center;justify-content:center;font-family:'Tajawal',sans-serif;font-weight:900;font-size:28px;color:white;flex-shrink:0}
+.hero-info{flex:1}
+.hero-name{font-family:'Tajawal',sans-serif;font-size:20px;font-weight:900;color:var(--text-primary);margin-bottom:4px}
+.hero-meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--text-secondary);margin-top:6px}
+.hero-meta span{display:flex;align-items:center;gap:4px}
+.hero-meta svg{width:13px;height:13px}
+.detail-tabs{display:flex;gap:4px;margin-bottom:16px;background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--r-md);padding:4px;overflow-x:auto}
+.detail-tab{padding:8px 16px;border-radius:var(--r-sm);font-size:12px;font-family:'Cairo',sans-serif;font-weight:600;color:var(--text-secondary);cursor:pointer;transition:all 0.2s;white-space:nowrap;border:none;background:none}
+.detail-tab.active{background:linear-gradient(135deg,rgba(255,122,26,0.15),rgba(245,200,66,0.1));color:var(--gold)}
+.detail-tab:hover:not(.active){color:var(--text-primary)}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-item{background:var(--glass-bg2);border:1px solid var(--glass-border);border-radius:var(--r-md);padding:12px 14px}
+.info-label{color:var(--text-muted);font-size:10px;margin-bottom:4px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.info-value{color:var(--text-primary);font-size:13px;font-weight:600}
+.info-value.phone{direction:ltr;text-align:right}
+.quote-list-item{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:10px;transition:all 0.18s;cursor:pointer}
+.quote-list-item:hover{border-color:var(--glass-border2);background:var(--glass-bg2)}
+.qli-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.qli-no{font-family:'Tajawal',sans-serif;font-size:13px;font-weight:700;color:var(--gold)}
+.qli-date{font-size:10.5px;color:var(--text-muted)}
+.qli-body{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.qli-val{font-size:13px;font-weight:700;color:var(--green)}
+.qli-kw{font-size:11px;color:var(--blue)}
+.qli-items{font-size:10.5px;color:var(--text-secondary)}
+.note-item{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:10px;transition:all 0.18s}
+.note-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.note-time{font-size:10px;color:var(--text-muted)}
+.note-type{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700}
+.note-type.call{color:var(--blue)}.note-type.meet{color:var(--green)}.note-type.note{color:var(--gold)}.note-type.reminder{color:var(--orange)}
+.note-body{color:var(--text-primary);font-size:12.5px;line-height:1.6}
+.note-actions{display:flex;gap:6px;margin-top:8px}
+.reminder-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;font-size:10px;font-weight:700}
+.reminder-due{background:rgba(255,82,82,0.12);color:var(--red);border:1px solid rgba(255,82,82,0.2)}
+.reminder-upcoming{background:rgba(245,200,66,0.1);color:var(--gold);border:1px solid rgba(245,200,66,0.2)}
+.reminder-done{background:rgba(61,214,140,0.1);color:var(--green);border:1px solid rgba(61,214,140,0.2)}
+.profit-panel{background:linear-gradient(135deg,rgba(17,7,0,0.8),rgba(26,15,0,0.8));border:1px solid rgba(255,122,26,0.2);border-radius:var(--r-xl);padding:18px 20px;margin-bottom:14px;backdrop-filter:blur(12px);position:relative;overflow:hidden}
+body.light .profit-panel{background:linear-gradient(135deg,#fff8f0,#fff3e0);border-color:rgba(255,122,26,0.25)}
+.profit-panel::before{content:'';position:absolute;top:-40px;left:-40px;width:150px;height:150px;background:radial-gradient(circle,rgba(255,122,26,0.1) 0%,transparent 70%)}
+.pp-title{color:var(--orange);font-size:13px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pp-title svg{width:16px;height:16px}
+.lock-badge{background:rgba(255,122,26,0.1);border:1px solid rgba(255,122,26,0.2);border-radius:20px;padding:2px 10px;font-size:9.5px;color:var(--orange)}
+.pp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px}
+.pp-field{display:flex;flex-direction:column;gap:4px}
+.pp-field label{color:var(--text-secondary);font-size:10px}
+.pp-input{background:rgba(255,255,255,0.06);border:1px solid rgba(255,122,26,0.2);border-radius:var(--r-md);color:var(--text-primary);padding:9px 12px;font-size:13px;font-family:'Cairo',sans-serif;outline:none;transition:all 0.2s}
+body.light .pp-input{background:rgba(255,255,255,0.9);border-color:rgba(255,122,26,0.3)}
+.pp-input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(255,122,26,0.1)}
+.pp-calc-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,122,26,0.1)}
+.pp-stat{display:flex;flex-direction:column;gap:2px}
+.pp-stat .lbl{color:var(--text-muted);font-size:9.5px}
+.pp-stat .val{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:800;color:var(--text-primary)}
+.profit-c{color:var(--green)!important}
+.loss-c{color:var(--red)!important}
+.steps-nav{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--glass-border)}
+.step-pill{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border-radius:20px;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-secondary);font-size:11px;font-family:'Cairo',sans-serif;cursor:pointer;transition:all 0.18s;font-weight:600}
+.step-pill:hover{border-color:var(--glass-border2);color:var(--text-primary)}
+.step-pill.active{background:linear-gradient(135deg,rgba(255,122,26,0.15),rgba(245,200,66,0.1));color:var(--gold);border-color:rgba(245,200,66,0.3);font-weight:700}
+.step-pill.done{border-color:rgba(61,214,140,0.3);color:var(--green)}
+.step-pill svg{width:14px;height:14px}
+.step-badge{background:var(--gold);color:var(--bg-base);border-radius:20px;padding:1px 6px;font-size:9px;font-weight:700}
+.step-pill.done .step-badge{background:var(--green)}
+.items-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:10px}
+.item-card{background:var(--glass-bg);border:2px solid var(--glass-border);border-radius:var(--r-lg);padding:14px;cursor:pointer;transition:all 0.18s;position:relative;text-align:center}
+.item-card:hover{border-color:rgba(245,200,66,0.3);transform:translateY(-2px);box-shadow:var(--shadow-sm)}
+.item-card.selected{border-color:var(--gold);background:rgba(245,200,66,0.06)}
+.item-check{position:absolute;top:8px;left:8px;width:20px;height:20px;border-radius:50%;background:var(--gold);display:none;align-items:center;justify-content:center}
+.item-card.selected .item-check{display:flex}
+.item-icon{width:40px;height:40px;background:var(--glass-bg2);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;margin:0 auto 10px}
+.item-icon svg{width:22px;height:22px}
+.item-name{font-weight:700;font-size:12.5px;color:var(--text-primary);margin-bottom:4px;line-height:1.3}
+.item-spec{font-size:10.5px;color:var(--text-secondary);margin-bottom:6px}
+.item-sell-price{font-family:'Tajawal',sans-serif;font-size:14px;font-weight:800;color:var(--green)}
+.item-unit{font-size:9.5px;color:var(--text-muted);margin-top:2px}
+.qty-row{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:10px;padding-top:8px;border-top:1px solid var(--glass-border)}
+.qty-btn{width:26px;height:26px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass-bg2);color:var(--text-primary);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.qty-btn:hover{border-color:var(--gold);color:var(--gold)}
+.qty-input{width:44px;height:26px;background:var(--glass-bg2);border:1px solid var(--glass-border);border-radius:8px;color:var(--text-primary);text-align:center;font-size:12px;font-family:'Cairo',sans-serif;outline:none}
+.qty-total{font-size:10px;color:var(--green);font-weight:700;white-space:nowrap}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--glass-border)}
+.live-bar{background:linear-gradient(135deg,var(--bg-elevated),var(--bg-overlay));border:1px solid var(--glass-border);border-radius:var(--r-xl);padding:14px 18px;margin-top:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.live-item{display:flex;flex-direction:column;gap:3px}
+.live-item .lbl{font-size:9.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px}
+.live-item .val{font-family:'Tajawal',sans-serif;font-size:18px;font-weight:900;color:var(--text-primary)}
+.live-item .val.sm{font-size:14px}
+.live-item .val.pv{font-size:15px;color:var(--orange)}
+.live-sep{width:1px;height:36px;background:var(--glass-border)}
+.live-iw{display:flex;flex-direction:column;gap:3px}
+.live-iw label{font-size:9.5px;color:var(--text-muted)}
+.live-mini{background:var(--glass-bg2);border:1px solid var(--glass-border);border-radius:var(--r-sm);color:var(--text-primary);padding:5px 8px;width:90px;font-size:12px;font-family:'Cairo',sans-serif;outline:none}
+.live-mini:focus{border-color:var(--gold)}
+.summary-hero{background:linear-gradient(160deg,#070B14 0%,#0d1425 50%,#0a1020 100%);border:1px solid var(--glass-border);border-radius:var(--r-2xl);padding:36px 28px;text-align:center;margin-bottom:14px;position:relative;overflow:hidden}
+body.light .summary-hero{background:linear-gradient(160deg,#1a237e,#283593,#1565c0)}
+.summary-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% -20%,rgba(255,122,26,0.18) 0%,transparent 70%)}
+.sh-badge{display:inline-block;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:20px;padding:4px 16px;font-size:10.5px;color:var(--gold);letter-spacing:1px;margin-bottom:12px}
+.sh-company{font-family:'Tajawal',sans-serif;font-size:24px;font-weight:900;color:var(--gold);margin-bottom:4px}
+.sh-sub{color:rgba(255,255,255,0.4);font-size:10px;letter-spacing:2px;margin-bottom:8px}
+body.light .sh-sub{color:rgba(255,255,255,0.6)}
+.sh-title{font-family:'Tajawal',sans-serif;font-size:17px;font-weight:700;color:white;margin-bottom:6px}
+.sh-meta{color:rgba(255,255,255,0.5);font-size:11px}
+.summary-table{width:100%;border-collapse:collapse}
+.summary-table th{padding:9px 12px;text-align:right;font-size:10.5px;color:var(--text-secondary);font-weight:700;border-bottom:1px solid var(--glass-border)}
+.summary-table td{padding:10px 12px;font-size:12px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.total-row{display:flex;justify-content:space-between;padding:8px 0;font-size:12.5px;border-bottom:1px solid var(--glass-border);color:var(--text-secondary)}
+.total-row.final{font-family:'Tajawal',sans-serif;font-size:17px;font-weight:800;color:var(--text-primary);border-bottom:none;margin-top:4px}
+.savings-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.sav-box{background:rgba(61,214,140,0.05);border:1px solid rgba(61,214,140,0.12);border-radius:var(--r-md);padding:12px 14px}
+.sav-box .lbl{font-size:9.5px;color:var(--text-muted);margin-bottom:4px}
+.sav-box .val{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:800;color:var(--green)}
+.warranty-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.w-box{background:rgba(76,155,255,0.05);border:1px solid rgba(76,155,255,0.12);border-radius:var(--r-md);padding:14px;text-align:center}
+.w-icon{display:flex;justify-content:center;margin-bottom:8px}
+.w-label{font-size:10px;color:var(--text-secondary);margin-bottom:4px}
+.w-years{font-family:'Tajawal',sans-serif;font-size:22px;font-weight:900;color:var(--blue)}
+.w-unit{font-size:9px;color:var(--text-muted)}
+.master-table{width:100%;border-collapse:collapse;font-size:12px}
+.master-table th{padding:9px 12px;text-align:right;color:var(--text-secondary);font-weight:700;border-bottom:1px solid var(--glass-border);font-size:10.5px}
+.master-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+.master-table tr:hover td{background:var(--glass-bg)}
+.hist-item{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--r-md);border:1px solid var(--glass-border);background:var(--glass-bg);margin-bottom:8px;flex-wrap:wrap;transition:all 0.18s}
+.hist-item:hover{border-color:var(--glass-border2);background:var(--glass-bg2)}
+.status-msg{text-align:center;padding:40px 20px;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;gap:10px}
+.s-icon{width:52px;height:52px;border-radius:var(--r-lg);background:var(--glass-bg2);display:flex;align-items:center;justify-content:center;color:var(--text-muted)}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:800;display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity 0.25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:var(--mode-surface);border:1px solid var(--glass-border2);border-radius:var(--r-2xl);width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);transform:translateY(20px);transition:transform 0.25s}
+.modal-overlay.open .modal-box{transform:translateY(0)}
+.modal-header{padding:20px 24px;border-bottom:1px solid var(--mode-border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--mode-surface);z-index:1}
+.modal-title{font-family:'Tajawal',sans-serif;font-size:16px;font-weight:800;color:var(--text-primary)}
+.modal-close{width:32px;height:32px;border-radius:var(--r-sm);border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.18s}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.modal-close svg{width:16px;height:16px}
+.modal-body{padding:24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--mode-border);display:flex;justify-content:flex-end;gap:10px}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--bg-elevated);border:1px solid var(--glass-border2);border-radius:var(--r-lg);padding:12px 20px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text-primary);z-index:9999;transition:transform 0.3s var(--spring),opacity 0.3s;opacity:0;min-width:260px;max-width:380px;box-shadow:var(--shadow-md);backdrop-filter:blur(20px)}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+.toast-icon{flex-shrink:0}
+#pdfTarget{position:absolute;left:-9999px;top:0;width:794px;background:white;color:#111;font-family:'Cairo',sans-serif;direction:rtl;padding:28px 30px;font-size:11px}
+#pdfTarget .ph{background:linear-gradient(135deg,#1a237e,#0d47a1);color:white;padding:24px;border-radius:12px;text-align:center;margin-bottom:18px}
+#pdfTarget .ph h1{font-size:22px;margin-bottom:4px;font-weight:900}
+#pdfTarget .ph .sub{font-size:9px;letter-spacing:2px;opacity:0.7;margin-bottom:8px}
+#pdfTarget .ph .qt{font-size:14px;font-weight:700;margin-bottom:6px}
+#pdfTarget .ph .qm{font-size:10px;opacity:0.7}
+#pdfTarget .pi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px}
+#pdfTarget .pi-box{background:#f8fafd;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px}
+#pdfTarget .pi-box .l{font-size:9px;color:#666;margin-bottom:3px}
+#pdfTarget .pi-box .v{font-weight:700;font-size:12px}
+#pdfTarget table{width:100%;border-collapse:collapse;margin-bottom:16px}
+#pdfTarget thead th{background:#f8fafd;padding:8px 10px;text-align:right;font-size:10px;border-bottom:2px solid #e2e8f0}
+#pdfTarget tbody td{padding:7px 10px;border-bottom:1px solid #f0f4fa;font-size:11px}
+#pdfTarget .feat-section,.warr-section,.sav-section{margin-bottom:16px}
+#pdfTarget h3{font-size:13px;font-weight:800;margin-bottom:10px;color:#1a237e}
+#pdfTarget .feat-grid,.warr-grid,.sav-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+#pdfTarget .feat-box,.sav-box{background:#f8fafd;border:1px solid #e2e8f0;border-radius:6px;padding:8px}
+#pdfTarget .feat-box .ft,.sav-box .l{font-size:8px;color:#666;margin-bottom:2px}
+#pdfTarget .feat-box .fv,.sav-box .v{font-size:10px;font-weight:700}
+#pdfTarget .warr-box{background:#e8f5e9;border:1px solid #c8e6c9;border-radius:6px;padding:10px;text-align:center}
+#pdfTarget .warr-box .wi{font-size:18px;margin-bottom:4px}
+#pdfTarget .warr-box .wl{font-size:8px;color:#666;margin-bottom:2px}
+#pdfTarget .warr-box .wy{font-size:20px;font-weight:900;color:#1a237e}
+#pdfTarget .warr-box .wu{font-size:8px;color:#999}
+#pdfTarget .final-price{background:linear-gradient(135deg,#1a237e,#0d47a1);color:white;border-radius:10px;padding:16px;text-align:center;margin-bottom:14px}
+#pdfTarget .final-price .lbl{font-size:11px;opacity:0.8;margin-bottom:4px}
+#pdfTarget .final-price .val{font-size:26px;font-weight:900}
+#pdfTarget .validity{display:flex;align-items:center;gap:10px;background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px;margin-bottom:14px}
+#pdfTarget .validity .vi{font-size:20px}
+#pdfTarget .validity .vt{font-size:10px;color:#555}
+#pdfTarget .footer{text-align:center;color:#999;font-size:9px;border-top:1px solid #eee;padding-top:10px}
+.sidebar-overlay{position:fixed;inset:0;z-index:299;background:rgba(0,0,0,0.5);display:none;backdrop-filter:blur(4px)}
+.sidebar-overlay.active{display:block}
+.mobile-menu-btn{display:none;width:36px;height:36px;background:var(--glass-bg);border:1px solid var(--mode-border);border-radius:var(--r-md);cursor:pointer;color:var(--text-secondary);align-items:center;justify-content:center;transition:all 0.2s}
+.mobile-menu-btn svg{width:18px;height:18px}
+@media (max-width:900px){.dash-stats{grid-template-columns:repeat(2,1fr)}.dash-quick-actions{grid-template-columns:1fr}}
+@media (max-width:768px){
+  :root{--sidebar-w:0px}
+  .sidebar{transform:translateX(100%);width:260px!important;box-shadow:var(--shadow-lg)}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .sidebar.collapsed{transform:translateX(100%)}
+  .main-wrap{margin-right:0!important}
+  .topbar{right:0!important}
+  .mobile-menu-btn{display:flex!important}
+}
+@media (max-width:640px){
+  .form-grid{grid-template-columns:1fr}.form-grid-3{grid-template-columns:1fr 1fr}
+  .items-grid{grid-template-columns:1fr 1fr}.pp-grid{grid-template-columns:1fr 1fr}
+  .action-row{gap:6px}.btn{padding:7px 12px;font-size:11px}
+  .dash-stats{grid-template-columns:1fr 1fr}.page{padding:16px 14px}
+  .warranty-grid{grid-template-columns:1fr 1fr}.info-grid{grid-template-columns:1fr}
+}
+@media (max-width:400px){.items-grid{grid-template-columns:1fr}.dash-stats{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-bg"></div>
+  <div class="login-grid-bg"></div>
+  <div class="login-particles" id="loginParticles"></div>
+  <div class="login-box">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-sun-wrap">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+        </div>
+        <div class="login-brand">العهد سولار</div>
+        <div class="login-brand-en">AL-AHD SOLAR — CRM</div>
+      </div>
+      <div class="login-greeting">أهلاً <span id="welcomeEng">بك</span></div>
+      <div class="login-hint">سجّل دخولك للمتابعة إلى نظام CRM</div>
+      <div class="login-field">
+        <label><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg> البريد الإلكتروني</label>
+        <div class="lf-wrap">
+          <input id="loginEmail" class="login-input ltr-input" type="email" placeholder="example@company.com" autocomplete="email"/>
+          <svg class="lf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+      </div>
+      <div class="login-field">
+        <label><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> كلمة المرور</label>
+        <div class="lf-wrap">
+          <input id="loginPassword" class="login-input ltr-input" type="password" placeholder="••••••••" autocomplete="current-password"/>
+          <svg class="lf-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <input id="loginRemember" type="checkbox" style="width:15px;height:15px;accent-color:var(--gold);cursor:pointer"/>
+        <label for="loginRemember" style="color:var(--text-secondary);font-size:12px;cursor:pointer">تذكّرني</label>
+      </div>
+      <button class="login-btn" id="loginBtn" onclick="doLogin()">دخول النظام ←</button>
+      <div class="login-err" id="loginErr"></div>
+      <div class="login-footer">العهد سولار © 2025 — نظام CRM للطاقة الشمسية</div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen">
+  <div id="loadingBar"></div>
+  <div class="toast" id="toast"><span class="toast-icon" id="toastIcon"></span><span id="toastText"></span></div>
+  <div id="pdfTarget"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeMobileSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+      </div>
+      <div class="sb-logo-text">
+        <div class="sb-logo-name">العهد سولار</div>
+        <div class="sb-logo-sub">SOLAR CRM SYSTEM</div>
+      </div>
+      <button class="sb-toggle" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-section-label">الرئيسية</div>
+      <div class="sb-item active" id="sb-dashboard" onclick="switchTab('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        <span class="sb-label">لوحة التحكم</span>
+      </div>
+      <div class="sb-section-label">إدارة العملاء</div>
+      <div class="sb-item" id="sb-clients" onclick="switchTab('clients')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span class="sb-label">العملاء</span>
+        <span class="sb-badge" id="sbClientsBadge" style="display:none">0</span>
+      </div>
+      <div class="sb-section-label">الأدوات</div>
+      <div class="sb-item" id="sb-quote" onclick="switchTab('quote')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="sb-label">عرض السعر</span>
+      </div>
+      <div class="sb-item" id="sb-master" onclick="switchTab('master')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+        <span class="sb-label">قائمة الأسعار</span>
+      </div>
+      <div class="sb-item" id="sb-history" onclick="switchTab('history')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="sb-label">سجل العروض</span>
+        <span class="sb-badge" id="sbHistBadge" style="display:none">0</span>
+      </div>
+    </nav>
+    <div class="sb-footer">
+      <div class="conn-status offline" id="sbConnStatus">
+        <span class="conn-dot"></span>
+        <span class="sb-label" id="sbConnText">غير متصل</span>
+      </div>
+      <div class="sb-user">
+        <div class="sb-avatar" id="sbAvatar">م</div>
+        <div class="sb-user-info">
+          <div class="sb-username" id="sbUsername">المستخدم</div>
+          <div class="sb-role" id="sbRole">مبيعات</div>
+        </div>
+      </div>
+      <div class="sb-actions">
+        <button class="sb-action-btn" onclick="loadData()" id="refreshBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" id="refreshIcon2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+          <span>تحديث</span>
+        </button>
+        <button class="sb-action-btn" onclick="doLogout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>خروج</span>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="main-wrap" id="mainWrap">
+    <header class="topbar" id="topbar">
+      <button class="mobile-menu-btn" onclick="openMobileSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="topbar-breadcrumb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        <span class="page-name" id="topbarPageName">لوحة التحكم</span>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <button class="mode-toggle" onclick="toggleMode()">
+          <svg id="modeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <span id="modeLabel">وضع النهار</span>
+        </button>
+        <button class="icon-btn-top" onclick="loadData()" id="refreshBtnTop">
+          <svg id="refreshIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>
+        </button>
+        <span style="color:var(--text-secondary);font-size:11px;font-weight:600" id="navUser"></span>
+      </div>
+    </header>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="dash-welcome">
+        <div class="dash-welcome-title">مرحباً، <span id="dashWelcomeName">م. هندسة</span> 👋</div>
+        <div class="dash-welcome-sub">نظام CRM — العهد سولار للطاقة الشمسية</div>
+        <div class="dash-welcome-right"><div class="dash-date-badge" id="dashDate">الأثنين، 1 يناير</div></div>
+      </div>
+      <div class="dash-stats">
+        <div class="dash-stat-card" style="--stat-color:rgba(245,200,66,0.1);--stat-bg:rgba(245,200,66,0.1)">
+          <div class="dash-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#F5C842" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+          <div class="dash-stat-value" id="statTotalClients">0</div>
+          <div class="dash-stat-label">إجمالي العملاء</div>
+        </div>
+        <div class="dash-stat-card" style="--stat-color:rgba(61,214,140,0.1);--stat-bg:rgba(61,214,140,0.1)">
+          <div class="dash-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3DD68C" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <div class="dash-stat-value" id="statTotalQuotes">0</div>
+          <div class="dash-stat-label">إجمالي العروض</div>
+        </div>
+        <div class="dash-stat-card" style="--stat-color:rgba(76,155,255,0.1);--stat-bg:rgba(76,155,255,0.1)">
+          <div class="dash-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4C9BFF" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="dash-stat-value" id="statFollowups">0</div>
+          <div class="dash-stat-label">يحتاج متابعة</div>
+        </div>
+        <div class="dash-stat-card" style="--stat-color:rgba(61,214,140,0.1);--stat-bg:rgba(61,214,140,0.1)">
+          <div class="dash-stat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3DD68C" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="dash-stat-value" id="statSold">0</div>
+          <div class="dash-stat-label">تم البيع</div>
+        </div>
+      </div>
+      <div class="dash-quick-actions">
+        <div class="quick-action" onclick="openAddClientModal()">
+          <div class="qa-icon" style="background:linear-gradient(135deg,rgba(255,122,26,0.15),rgba(245,200,66,0.1));border:1px solid rgba(245,200,66,0.15)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#F5C842" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          </div>
+          <div><div class="qa-title">إضافة عميل جديد</div><div class="qa-sub">سجّل بيانات عميل جديد في قاعدة البيانات</div></div>
+        </div>
+        <div class="quick-action" onclick="switchTab('quote')">
+          <div class="qa-icon" style="background:rgba(61,214,140,0.1);border:1px solid rgba(61,214,140,0.15)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#3DD68C" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          </div>
+          <div><div class="qa-title">إنشاء عرض سعر جديد</div><div class="qa-sub">ابدأ عرضاً جديداً لمنظومة طاقة شمسية</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#FF7A1A" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div>
+          التذكيرات القادمة
+        </div>
+        <div id="dashReminders"></div>
+      </div>
+    </div>
+
+    <!-- CLIENTS PAGE -->
+    <div id="page-clients" class="page">
+      <div class="page-header"><h1>قاعدة بيانات العملاء</h1><p>إدارة وتتبع جميع عملاء الطاقة الشمسية</p></div>
+      <div class="crm-toolbar">
+        <div class="crm-search-wrap">
+          <input class="crm-search" id="clientSearch" placeholder="البحث بالاسم، الهاتف، المحافظة..." oninput="renderClientsTable()"/>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <select class="crm-filter-select" id="statusFilter" onchange="renderClientsTable()">
+          <option value="">كل الحالات</option>
+          <option value="new">جديد</option><option value="followup">متابعة</option>
+          <option value="interested">مهتم</option><option value="negotiation">تفاوض</option>
+          <option value="sold">تم البيع</option><option value="rejected">مرفوض</option>
+        </select>
+        <select class="crm-filter-select" id="sortFilter" onchange="renderClientsTable()">
+          <option value="newest">الأحدث أولاً</option><option value="oldest">الأقدم أولاً</option>
+          <option value="name">الاسم</option><option value="status">الحالة</option>
+        </select>
+        <button class="btn btn-primary" onclick="openAddClientModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          عميل جديد
+        </button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="clients-table-wrap">
+          <table class="clients-table">
+            <thead><tr><th>العميل</th><th>الهاتف / واتساب</th><th>المحافظة</th><th>المصدر</th><th>الحالة</th><th>العروض</th><th>تاريخ الإضافة</th><th>إجراءات</th></tr></thead>
+            <tbody id="clientsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENT DETAIL PAGE -->
+    <div id="page-clientDetail" class="page">
+      <div class="action-row">
+        <button class="btn" onclick="switchTab('clients')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+          رجوع للعملاء
+        </button>
+        <button class="btn btn-primary" onclick="openEditClientModal(currentClientId)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          تعديل البيانات
+        </button>
+        <button class="btn btn-success" onclick="openAddNoteModal(currentClientId)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          إضافة ملاحظة
+        </button>
+        <button class="btn btn-blue" onclick="startQuoteForClient(currentClientId)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          إنشاء عرض سعر
+        </button>
+      </div>
+      <div id="clientDetailContent"></div>
+    </div>
+
+    <!-- QUOTE PAGE -->
+    <div id="page-quote" class="page">
+      <div class="page-header"><h1>إنشاء عرض سعر</h1><p>أدخل بيانات العميل واختر مكونات المنظومة</p></div>
+      <div id="clientCard" class="card">
+        <div class="card-title">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#F5C842" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          بيانات العميل
+        </div>
+        <div style="margin-bottom:10px">
+          <select id="linkClientSelect" class="form-input" onchange="linkClientToQuote(this.value)" style="margin-bottom:8px">
+            <option value="">— اختر عميل من القاعدة (اختياري) —</option>
+          </select>
+        </div>
+        <div class="form-grid">
+          <div class="form-group"><label>اسم العميل *</label><input id="cName" class="form-input" placeholder="اكتب اسم العميل"/></div>
+          <div class="form-group"><label>العنوان / المشروع</label><input id="cAddr" class="form-input" placeholder="المدينة أو العنوان"/></div>
+          <div class="form-group"><label>رقم الهاتف</label><input id="cPhone" class="form-input" type="tel" placeholder="01xxxxxxxxx"/></div>
+          <div class="form-group"><label>مهندس المبيعات</label><input id="cEng" class="form-input" placeholder="اسمك هنا"/></div>
+        </div>
+        <div style="margin-top:14px;padding:14px;background:rgba(61,214,140,0.06);border:1px solid rgba(61,214,140,0.2);border-radius:var(--r-lg)">
+          <div style="color:var(--green);font-size:11px;font-weight:700;margin-bottom:8px">السعر النهائي للعميل</div>
+          <div class="form-group">
+            <label>سعر البيع النهائي (ج.م) — يظهر في العرض — اتركه فارغاً للحساب التلقائي</label>
+            <input id="finalClientPrice" class="form-input" type="number" min="0" placeholder="0" oninput="updateLive()"/>
+          </div>
+        </div>
+      </div>
+      <div id="profitPanel" class="profit-panel">
+        <div class="pp-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          لوحة التكلفة والربح <span class="lock-badge">سري • لا يظهر في PDF</span>
+        </div>
+        <div class="pp-grid">
+          <div class="pp-field"><label>تكلفتي الإجمالية (ج.م)</label><input id="costInput" class="pp-input" type="number" min="0" value="0" oninput="updateProfit()"/></div>
+          <div class="pp-field"><label>ربح مضاف على كل kW (ج.م)</label><input id="marginPerKw" class="pp-input" type="number" min="0" value="0" oninput="updateProfit()"/></div>
+          <div class="pp-field"><label>نسبة ربح % على التكلفة</label><input id="marginPct" class="pp-input" type="number" min="0" value="0" oninput="updateProfit()"/></div>
+        </div>
+        <div class="pp-calc-row" id="ppCalcRow"></div>
+      </div>
+      <div id="stepsWrap">
+        <div class="steps-nav" id="stepsBar"></div>
+        <div class="card">
+          <div class="card-title" id="stepTitle"></div>
+          <div class="items-grid" id="itemsGrid"></div>
+          <div class="nav-row">
+            <button class="btn" id="prevBtn" onclick="prevStep()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> السابق
+            </button>
+            <button class="btn btn-primary" id="nextBtn" onclick="nextStep()">
+              التالي <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="live-bar" id="liveBar">
+        <div class="live-item"><div class="lbl">سعر البيع للعميل</div><div class="val" id="liveTotal">0 ج.م</div></div>
+        <div class="live-sep"></div>
+        <div class="live-item" id="liveKwWrap" style="display:none"><div class="lbl">القدرة</div><div class="val sm" id="liveKw"></div></div>
+        <div class="live-item" id="livePpwWrap" style="display:none"><div class="lbl">سعر/kW للعميل</div><div class="val sm" id="livePpw"></div></div>
+        <div class="live-item" id="liveProfitWrap" style="display:none"><div class="lbl">ربحي</div><div class="val pv" id="liveProfit"></div></div>
+        <div class="live-sep"></div>
+        <div class="live-iw"><label>سعر kWh الشبكة</label><input id="gridPrice" type="number" value="2.5" step="0.5" min="0" class="live-mini" oninput="updateLive()"/></div>
+        <div class="live-iw"><label>خصم (ج.م)</label><input id="discountInput" type="number" value="0" min="0" class="live-mini" oninput="updateLive()"/></div>
+      </div>
+      <div id="quoteStatus" class="status-msg" style="display:none">
+        <div class="s-icon" id="qsIcon"></div>
+        <div id="qsText">جاري التحميل...</div>
+      </div>
+    </div>
+
+    <!-- MASTER PAGE -->
+    <div id="page-master" class="page">
+      <div class="page-header"><h1>قائمة الأسعار</h1><p>الأسعار المحدّثة من Google Sheet</p></div>
+      <div class="card" style="text-align:center;padding:28px 20px;margin-bottom:14px">
+        <div style="width:56px;height:56px;background:linear-gradient(135deg,rgba(255,122,26,0.15),rgba(245,200,66,0.1));border:1px solid rgba(245,200,66,0.2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#F5C842" stroke-width="2" width="28" height="28"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        </div>
+        <div style="color:var(--text-primary);font-family:'Tajawal',sans-serif;font-size:15px;font-weight:700;margin-bottom:6px">الأسعار بتيجي من Google Sheet</div>
+        <div style="color:var(--text-secondary);font-size:12px;margin-bottom:18px">عدّل في الشيت ← اضغط تحديث ← بيتحدث أوتوماتيك</div>
+        <a id="openSheetLink" href="#" target="_blank" class="btn btn-primary" style="display:inline-flex;text-decoration:none">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+          افتح Google Sheet
+        </a>
+      </div>
+      <div id="masterPreview"></div>
+    </div>
+
+    <!-- HISTORY PAGE -->
+    <div id="page-history" class="page">
+      <div class="page-header"><h1>سجل العروض</h1><p>جميع عروض الأسعار المحفوظة</p></div>
+      <div class="card">
+        <div class="card-title">
+          <div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#F5C842" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+          سجل عروض الأسعار
+        </div>
+        <div id="historyList"></div>
+      </div>
+    </div>
+
+    <!-- SUMMARY PAGE -->
+    <div id="page-summary" class="page">
+      <div class="action-row">
+        <button class="btn" onclick="backToQuote()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg> رجوع</button>
+        <button class="btn btn-pdf" onclick="generatePDF()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> PDF</button>
+        <button class="btn btn-wa" onclick="shareWhatsApp()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg> واتساب</button>
+        <button class="btn btn-share" onclick="shareQuote()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> مشاركة</button>
+        <button class="btn btn-success" onclick="saveToHistory()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> حفظ</button>
+        <button class="btn" onclick="copyQuoteText()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> نسخ</button>
+      </div>
+      <div id="summaryContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="clientModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="clientModalTitle">إضافة عميل جديد</div>
+      <button class="modal-close" onclick="closeModal('clientModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="editClientId"/>
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="form-group"><label>الاسم *</label><input id="cm_name" class="form-input" placeholder="اسم العميل الكامل"/></div>
+        <div class="form-group"><label>رقم الهاتف</label><input id="cm_phone" class="form-input" type="tel" placeholder="01xxxxxxxxx"/></div>
+        <div class="form-group"><label>واتساب</label><input id="cm_whatsapp" class="form-input" type="tel" placeholder="01xxxxxxxxx"/></div>
+        <div class="form-group"><label>البريد الإلكتروني</label><input id="cm_email" class="form-input" type="email" placeholder="example@email.com"/></div>
+        <div class="form-group">
+          <label>المحافظة</label>
+          <select id="cm_governorate" class="form-input">
+            <option value="">اختر المحافظة</option>
+            <option>القاهرة</option><option>الجيزة</option><option>الإسكندرية</option>
+            <option>القليوبية</option><option>الشرقية</option><option>الدقهلية</option>
+            <option>البحيرة</option><option>المنوفية</option><option>الغربية</option>
+            <option>كفر الشيخ</option><option>دمياط</option><option>الإسماعيلية</option>
+            <option>بورسعيد</option><option>السويس</option><option>شمال سيناء</option>
+            <option>جنوب سيناء</option><option>الفيوم</option><option>بني سويف</option>
+            <option>المنيا</option><option>أسيوط</option><option>سوهاج</option>
+            <option>قنا</option><option>الأقصر</option><option>أسوان</option>
+            <option>البحر الأحمر</option><option>الوادي الجديد</option><option>مطروح</option>
+          </select>
+        </div>
+        <div class="form-group"><label>العنوان التفصيلي</label><input id="cm_address" class="form-input" placeholder="الشارع، المنطقة"/></div>
+        <div class="form-group">
+          <label>مصدر العميل</label>
+          <select id="cm_source" class="form-input">
+            <option value="">اختر المصدر</option>
+            <option>واتساب</option><option>فيسبوك</option><option>إنستجرام</option>
+            <option>إعلان Google</option><option>توصية من عميل</option><option>زيارة مباشرة</option>
+            <option>معرض أو فعالية</option><option>موقع الشركة</option><option>أخرى</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>الحالة</label>
+          <select id="cm_status" class="form-input">
+            <option value="new">جديد</option><option value="followup">متابعة</option>
+            <option value="interested">مهتم</option><option value="negotiation">تفاوض</option>
+            <option value="sold">تم البيع</option><option value="rejected">مرفوض</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label>ملاحظات عامة</label><textarea id="cm_notes" class="form-input" rows="3" placeholder="أي ملاحظات إضافية..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('clientModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveClient()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/></svg> حفظ</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="noteModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">إضافة ملاحظة / تذكير</div>
+      <button class="modal-close" onclick="closeModal('noteModal')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="noteClientId"/>
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="form-group">
+          <label>نوع الملاحظة</label>
+          <select id="note_type" class="form-input">
+            <option value="note">📝 ملاحظة عامة</option>
+            <option value="call">📞 مكالمة</option>
+            <option value="meet">🤝 اجتماع</option>
+            <option value="reminder">⏰ تذكير متابعة</option>
+          </select>
+        </div>
+        <div class="form-group" id="reminderDateGroup" style="display:none">
+          <label>تاريخ التذكير</label>
+          <input id="note_reminder_date" class="form-input" type="datetime-local"/>
+        </div>
+      </div>
+      <div class="form-group"><label>نص الملاحظة *</label><textarea id="note_text" class="form-input" rows="4" placeholder="اكتب ملاحظتك هنا..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('noteModal')">إلغاء</button>
+      <button class="btn btn-primary" onclick="saveNote()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/></svg> حفظ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+ /* ══════════════════════════════════════════════════════════════
+   SUPABASE INIT — SINGLE INSTANCE
+══════════════════════════════════════════════════════════════ */
+
+const SUPABASE_URL = 'https://ajjuugdccmtnzxgpzwpg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_DTiGXZSdC4KONexspAHHJw_KFsVPcy2';
+
+// Async storage adapter — supabase-js v2.39+ requires async getItem/setItem/removeItem.
+// Hierarchy per operation: localStorage → sessionStorage → memory.
+// Each call tries the next tier automatically on failure — no single picked store.
+// sessionStorage survives page refresh and is NOT blocked by Tracking Prevention.
+// memory is last resort only; session will not survive a full page reload in that case.
+const _authStorage = (() => {
+  const mem = {};
+  const _ls  = () => { try { return localStorage;   } catch(e) { return null; } };
+  const _ss  = () => { try { return sessionStorage;  } catch(e) { return null; } };
+  return {
+    getItem: async (k) => {
+      try { const v = _ls()?.getItem(k);  if (v !== undefined && v !== null) return v; } catch(e) {}
+      try { const v = _ss()?.getItem(k);  if (v !== undefined && v !== null) return v; } catch(e) {}
+      return mem[k] ?? null;
+    },
+    setItem: async (k, v) => {
+      try { _ls()?.setItem(k, v); return; } catch(e) {}
+      try { _ss()?.setItem(k, v); return; } catch(e) {}
+      mem[k] = v;
+    },
+    removeItem: async (k) => {
+      try { _ls()?.removeItem(k); } catch(e) {}
+      try { _ss()?.removeItem(k); } catch(e) {}
+      delete mem[k];
+    },
+  };
+})();
+
+let db = null;
+
+try {
+  db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY,
+    {
+      auth: {
+        persistSession:     true,          // ✅ كان false — السبب الرئيسي للمشكلة
+        autoRefreshToken:   true,          // ✅ كان false
+        detectSessionInUrl: false,
+        storage:            _authStorage,  // ✅ custom storage يتجاوز Tracking Prevention
+        storageKey:         'ahd_solar_sb_auth',
+        flowType:           'implicit',
+      }
+    }
+  );
+
+  console.log('✅ Supabase Connected — Al-Ahd Solar CRM');
+
+} catch (e) {
+  console.warn('⚠️ Supabase init failed:', e.message);
+}
+/* ══════════════════════════════════════════════════════════════
+   AUTH STATE — CURRENT LOGGED-IN USER
+══════════════════════════════════════════════════════════════ */
+let currentUser     = null;   // auth.users row (from Supabase session)
+let currentProfile  = null;   // public.users row (role, full_name, etc.)
+
+const ROLE_LABELS = { admin:'مدير النظام', manager:'مدير', sales:'مبيعات' };
+
+async function loadUserProfile(userId) {
+  if (!db || !userId) return null;
+  try {
+    const { data, error } = await db
+      .from('users')
+      .select('*')
+      .eq('id', userId)
+      .maybeSingle();
+    if (error) { console.warn('⚠️ loadUserProfile:', error.message); return null; }
+    return data;
+  } catch(e) {
+    console.warn('⚠️ loadUserProfile exception:', e.message);
+    return null;
+  }
+}
+
+function applyUserToUI(profile, authUser) {
+  const displayName = profile?.full_name || authUser?.email?.split('@')[0] || 'مستخدم';
+  const role        = profile?.role || 'sales';
+  const initial     = displayName.charAt(0).toUpperCase();
+
+  // Sidebar
+  const sbAvatar = document.getElementById('sbAvatar');
+  const sbUsername = document.getElementById('sbUsername');
+  const sbRoleEl   = document.getElementById('sbRole');
+  if (sbAvatar)   sbAvatar.textContent   = initial;
+  if (sbUsername) sbUsername.textContent = displayName;
+  if (sbRoleEl)   sbRoleEl.textContent   = ROLE_LABELS[role] || role;
+
+  // Topbar name
+  const navUser = document.getElementById('navUser');
+  if (navUser) navUser.textContent = displayName;
+
+  // Dashboard welcome
+  const dashWelcomeName = document.getElementById('dashWelcomeName');
+  if (dashWelcomeName) dashWelcomeName.textContent = displayName;
+
+  // Quote engineer name pre-fill
+  const cEng = document.getElementById('cEng');
+  if (cEng) cEng.value = displayName;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CONSTANTS & GLOBAL STATE
+══════════════════════════════════════════════════════════════ */
+const COMPANY    = 'العهد سولار';
+const COMPANY_EN = 'Al-Ahd Solar';
+const SCRIPT_KEY = 'ahd_solar_url';
+const HISTORY_KEY= 'ahd_solar_history';
+const CLIENTS_KEY= 'ahd_solar_clients';
+const NOTES_KEY  = 'ahd_solar_notes';
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyy45dazwKq9SDkCYvXl9NTqSD0x2KgCkKRK4ulZEkUZ2t9K7cw7ab9eEjheh8LhfJB/exec';
+
+let catalog={}, catOrder=[], selections={}, currentStep=0, lastQ=null;
+let isDarkMode = true;
+let currentClientId = null;
+let quotingForClientId = null;
+
+/* ══ localStorage guard ══ */
+const _storage = (function(){
+  try { localStorage.setItem('__test__','1'); localStorage.removeItem('__test__'); return localStorage; }
+  catch(e){ console.warn('⚠️ localStorage unavailable'); return {getItem:()=>null,setItem:()=>{},removeItem:()=>{}}; }
+})();
+
+/* ══ LocalStorage CRUD helpers ══ */
+function _lsGet(key, fallback=[]){
+  try { return JSON.parse(_storage.getItem(key) || JSON.stringify(fallback)); }
+  catch(e){ console.error('localStorage read error:', e); return fallback; }
+}
+function _lsSet(key, val){
+  try { _storage.setItem(key, JSON.stringify(val)); }
+  catch(e){ console.error('localStorage write error:', e); }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUPABASE ERROR HELPER
+══════════════════════════════════════════════════════════════ */
+function _sbErr(label, e){
+  console.error(`❌ Supabase [${label}]:`, e?.message || e);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SUPABASE CRM LAYER
+   All customer operations use Supabase with localStorage fallback.
+══════════════════════════════════════════════════════════════ */
+
+// Load customers from Supabase (falls back to localStorage)
+async function getClients(){
+  if(db){
+    try {
+      const {data, error} = await db.from('customers').select('*').order('created_at', {ascending:false});
+      if(error) throw error;
+      console.log('✅ Customers Loaded from Supabase:', data.length);
+      // Map Supabase columns to app fields
+      return data.map(mapFromSupabase);
+    } catch(e){
+      console.warn('Supabase getClients failed, using localStorage:', e.message);
+    }
+  }
+  return _lsGet(CLIENTS_KEY, []);
+}
+
+// Map Supabase row → app client object
+function mapFromSupabase(row){
+  return {
+    id: row.id,
+    name: row.name || '',
+    phone: row.phone || '',
+    whatsapp: row.whatsapp || '',
+    email: row.email || '',
+    governorate: row.governorate || '',
+    address: row.address || '',
+    source: row.source || '',
+    status: row.status || 'new',
+    notes: row.notes || '',
+    createdAt: row.created_at ? new Date(row.created_at).toLocaleString('ar-EG') : '',
+    updatedAt: row.updated_at ? new Date(row.updated_at).toLocaleString('ar-EG') : '',
+    lastQuoteDate: row.last_quote_date || ''
+  };
+}
+
+// Map app client object → Supabase row
+function mapToSupabase(client){
+  return {
+    name: client.name,
+    phone: client.phone || null,
+    whatsapp: client.whatsapp || null,
+    email: client.email || null,
+    governorate: client.governorate || null,
+    address: client.address || null,
+    source: client.source || null,
+    status: client.status || 'new',
+    notes: client.notes || null,
+    updated_at: new Date().toISOString(),
+    // owner_id: set on INSERT only (not overwritten on UPDATE so ownership is preserved)
+    ...(client._isNew && currentUser ? { owner_id: currentUser.id } : {})
+  };
+}
+
+// Save/update a single client in Supabase
+// Supabase customers.id is BIGINT — real IDs are positive integers.
+// Legacy localStorage IDs start with 'c' (e.g. 'c1718000000123').
+async function saveClientToSupabase(clientData, editId){
+  if(!db) return null;
+  try {
+    if(isRealSupabaseId(editId)){
+      const row = mapToSupabase({...clientData, _isNew: false});
+      const {data, error} = await db.from('customers').update(row).eq('id', Number(editId)).select();
+      if(error) throw error;
+      console.log('✅ Customer Saved to Supabase');
+      return data[0];
+    } else {
+      // New client — include owner_id
+      const row = mapToSupabase({...clientData, _isNew: true});
+      const {data, error} = await db.from('customers').insert([row]).select();
+      if(error) throw error;
+      console.log('✅ Customer Inserted to Supabase');
+      return data[0];
+    }
+  } catch(e){
+    console.warn('Supabase save failed:', e.message);
+    return null;
+  }
+}
+
+// Delete client from Supabase
+async function deleteClientFromSupabase(id){
+  if(!db || !isRealSupabaseId(id)) return;
+  try {
+    const {error} = await db.from('customers').delete().eq('id', Number(id));
+    if(error) throw error;
+    console.log('✅ Customer deleted from Supabase');
+  } catch(e){
+    console.warn('Supabase delete failed:', e.message);
+  }
+}
+
+// Update client status in Supabase
+async function updateStatusInSupabase(id, status){
+  if(!db || !isRealSupabaseId(id)) return;
+  try {
+    const {error} = await db.from('customers').update({status, updated_at: new Date().toISOString()}).eq('id', Number(id));
+    if(error) throw error;
+  } catch(e){
+    console.warn('Supabase status update failed:', e.message);
+  }
+}
+
+// Dashboard stats from Supabase (customers + quotes + reminders)
+async function getSupabaseStats(){
+  if(!db) return null;
+  try {
+    const [{data:customers,error:e1},{data:quotes,error:e2},{data:reminders,error:e3}] = await Promise.all([
+      db.from('customers').select('status'),
+      db.from('quotes').select('id',{count:'exact',head:false}),
+      db.from('notes').select('id,done,reminder_date').eq('type','reminder').eq('done',false)
+    ]);
+    if(e1) throw e1; if(e2) throw e2; if(e3) throw e3;
+    const now=new Date();
+    const upcoming=(reminders||[]).filter(n=>n.reminder_date&&new Date(n.reminder_date)<=new Date(now.getTime()+7*24*60*60*1000));
+    return {
+      total: customers.length,
+      sold: customers.filter(r=>r.status==='sold').length,
+      followups: customers.filter(r=>['followup','negotiation','interested'].includes(r.status)).length,
+      quotes: (quotes||[]).length,
+      upcomingReminders: upcoming.length
+    };
+  } catch(e){
+    _sbErr('getSupabaseStats',e);
+    return null;
+  }
+}
+
+// localStorage client fallbacks (used when Supabase unavailable)
+function getClientsSync(){ return _lsGet(CLIENTS_KEY, []); }
+function saveClientsSync(arr){ _lsSet(CLIENTS_KEY, arr); }
+
+/* ══════════════════════════════════════════════════════════════
+   NOTES — Full Supabase Layer
+══════════════════════════════════════════════════════════════ */
+async function getNotes(clientId){
+  if(db){
+    try{
+      let q = db.from('notes').select('*').order('created_at',{ascending:false});
+      if(clientId){
+        if(isRealSupabaseId(clientId)){
+          q = q.eq('client_id', Number(clientId));
+        } else {
+          // Legacy localStorage-only client — no rows in Supabase notes
+          return _lsGet(NOTES_KEY,[]).filter(n=>String(n.clientId)===String(clientId));
+        }
+      }
+      const {data,error} = await q;
+      if(error) throw error;
+      return data.map(mapNoteFromSB);
+    }catch(e){ _sbErr('getNotes',e); }
+  }
+  // fallback: legacy localStorage
+  const all = _lsGet(NOTES_KEY,[]);
+  return clientId ? all.filter(n=>String(n.clientId)===String(clientId)) : all;
+}
+async function saveNoteToDB(note){
+  if(db){
+    try{
+      const row = mapNoteToSB(note);
+      const {data,error} = await db.from('notes').insert([row]).select();
+      if(error) throw error;
+      console.log('✅ Note saved to Supabase');
+      return mapNoteFromSB(data[0]);
+    }catch(e){ _sbErr('saveNoteToDB',e); }
+  }
+  // fallback localStorage
+  const notes = _lsGet(NOTES_KEY,[]);
+  notes.unshift(note);
+  _lsSet(NOTES_KEY, notes);
+  return note;
+}
+async function deleteNoteFromDB(nid){
+  if(db){
+    try{
+      const {error} = await db.from('notes').delete().eq('id', nid);
+      if(error) throw error;
+      console.log('✅ Note deleted from Supabase');
+      return;
+    }catch(e){ _sbErr('deleteNoteFromDB',e); }
+  }
+  // fallback localStorage
+  let notes = _lsGet(NOTES_KEY,[]);
+  notes = notes.filter(n=>n.id!==nid);
+  _lsSet(NOTES_KEY, notes);
+}
+async function markNoteReminderDoneInDB(nid){
+  if(db){
+    try{
+      const {error} = await db.from('notes').update({done:true}).eq('id', nid);
+      if(error) throw error;
+      console.log('✅ Reminder marked done in Supabase');
+      return;
+    }catch(e){ _sbErr('markNoteReminderDoneInDB',e); }
+  }
+  // fallback localStorage
+  const notes = _lsGet(NOTES_KEY,[]);
+  const idx = notes.findIndex(n=>n.id===nid);
+  if(idx>=0){ notes[idx].done=true; _lsSet(NOTES_KEY, notes); }
+}
+async function deleteClientNotes(clientId){
+  if(db && isRealSupabaseId(clientId)){
+    try{
+      const {error} = await db.from('notes').delete().eq('client_id', Number(clientId));
+      if(error) throw error;
+      return;
+    }catch(e){ _sbErr('deleteClientNotes',e); }
+  }
+  // fallback localStorage
+  let notes = _lsGet(NOTES_KEY,[]);
+  notes = notes.filter(n=>String(n.clientId)!==String(clientId));
+  _lsSet(NOTES_KEY, notes);
+}
+function mapNoteFromSB(row){
+  return {
+    id: row.id,           // UUID from notes table
+    clientId: row.client_id, // BIGINT — keep as-is for string comparisons in UI
+    type: row.type||'note',
+    text: row.text||'',
+    createdAt: row.created_at ? new Date(row.created_at).toLocaleString('ar-EG') : '',
+    reminderDate: row.reminder_date||null,
+    done: !!row.done
+  };
+}
+function mapNoteToSB(n){
+  return {
+    client_id: isRealSupabaseId(n.clientId) ? Number(n.clientId) : null,
+    type: n.type||'note',
+    text: n.text||'',
+    reminder_date: n.reminderDate||null,
+    done: !!n.done
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════
+   QUOTES (HISTORY) — Full Supabase Layer
+══════════════════════════════════════════════════════════════ */
+async function getHistory(){
+  if(db){
+    try{
+      const {data,error} = await db.from('quotes').select('*').order('saved_at',{ascending:false});
+      if(error) throw error;
+      return data.map(mapQuoteFromSB);
+    }catch(e){ _sbErr('getHistory',e); }
+  }
+  return _lsGet(HISTORY_KEY,[]);
+}
+async function saveQuoteToDB(quote){
+  if(db){
+    try{
+      const row = mapQuoteToSB(quote);
+      const {data,error} = await db.from('quotes').insert([row]).select();
+      if(error) throw error;
+      console.log('✅ Quote saved to Supabase:', data[0].quote_no);
+      return mapQuoteFromSB(data[0]);
+    }catch(e){ _sbErr('saveQuoteToDB',e); }
+  }
+  // fallback localStorage
+  const hist = _lsGet(HISTORY_KEY,[]);
+  hist.unshift(quote);
+  if(hist.length>60) hist.pop();
+  _lsSet(HISTORY_KEY, hist);
+  return quote;
+}
+async function deleteQuoteFromDB(quoteNo){
+  if(db){
+    try{
+      const {error} = await db.from('quotes').delete().eq('quote_no', quoteNo);
+      if(error) throw error;
+      console.log('✅ Quote deleted from Supabase');
+      return;
+    }catch(e){ _sbErr('deleteQuoteFromDB',e); }
+  }
+  // fallback localStorage
+  let hist = _lsGet(HISTORY_KEY,[]);
+  hist = hist.filter(h=>h.quoteNo!==quoteNo);
+  _lsSet(HISTORY_KEY, hist);
+}
+function mapQuoteFromSB(row){
+  let payload={};
+  try{ payload = typeof row.payload==='string' ? JSON.parse(row.payload) : (row.payload||{}); }catch(e){}
+  return {
+    ...payload,
+    quoteNo: row.quote_no,
+    cn: row.client_name||payload.cn||'',
+    fin: row.total_amount||payload.fin||0,
+    kw: row.kw||payload.kw||0,
+    clientId: row.customer_id||payload.clientId||null,
+    savedAt: row.saved_at ? new Date(row.saved_at).toLocaleString('ar-EG') : ''
+  };
+}
+function mapQuoteToSB(q){
+  return {
+    quote_no: q.quoteNo,
+    client_name: q.cn||'',
+    total_amount: Math.round(q.fin||0),
+    kw: q.kw||0,
+    // customer_id is BIGINT — only pass a number if it's a real Supabase ID
+    customer_id: isRealSupabaseId(q.clientId) ? Number(q.clientId) : null,
+    // owner_id — tag the quote with the current authenticated user
+    owner_id: currentUser ? currentUser.id : null,
+    payload: JSON.stringify(q)
+  };
+}
+
+/* ══ STATUS LABELS ══ */
+const STATUS_LABELS = {new:'جديد',followup:'متابعة',interested:'مهتم',negotiation:'تفاوض',sold:'تم البيع',rejected:'مرفوض'};
+const STATUS_CLASS  = {new:'status-new',followup:'status-followup',interested:'status-interested',negotiation:'status-negotiation',sold:'status-sold',rejected:'status-rejected'};
+function statusBadge(s){ return `<span class="status-badge ${STATUS_CLASS[s]||'status-new'}">${STATUS_LABELS[s]||s}</span>`; }
+
+/* ══ UTILS ══ */
+function fmt(n){ return (n||0).toLocaleString('ar-EG'); }
+// Legacy localStorage IDs are prefixed 'c' (e.g. 'c1718000000123').
+// Supabase customers.id is BIGINT — a positive integer.
+// This helper returns true only for real Supabase numeric IDs.
+function isRealSupabaseId(id){
+  if(id === null || id === undefined || id === '') return false;
+  const s = String(id);
+  if(s.startsWith('c')) return false; // legacy localStorage ID
+  return /^\d+$/.test(s) && Number(s) > 0;
+}
+function genId(){ return 'c'+Date.now()+Math.floor(Math.random()*1000); }
+function esc(str){ // FIX: Escape HTML to prevent XSS
+  if(!str) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+function show(id,type){ const el=document.getElementById(id); if(el) el.style.display=type||'block'; }
+function hide(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
+
+/* ══ PARTICLES LOGIN ══ */
+(function(){
+  const wrap=document.getElementById('loginParticles'); if(!wrap) return;
+  for(let i=0;i<15;i++){
+    const s=document.createElement('span');
+    const size=Math.random()*6+2;
+    s.style.cssText=`width:${size}px;height:${size}px;left:${Math.random()*100}%;top:${70+Math.random()*30}%;--dur:${6+Math.random()*8}s;--delay:${Math.random()*6}s;`;
+    wrap.appendChild(s);
+  }
+})();
+
+/* ══ MODE ══ */
+function toggleMode(){
+  isDarkMode=!isDarkMode;
+  document.body.classList.toggle('light',!isDarkMode);
+  const label=document.getElementById('modeLabel');
+  const icon=document.getElementById('modeIcon');
+  if(isDarkMode){ label.textContent='وضع النهار'; icon.innerHTML='<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; }
+  else { label.textContent='الوضع الليلي'; icon.innerHTML='<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'; }
+  _storage.setItem('ahd_mode', isDarkMode?'dark':'light');
+}
+
+/* ══ SIDEBAR ══ */
+let sidebarCollapsed=false;
+function toggleSidebar(){ sidebarCollapsed=!sidebarCollapsed; document.getElementById('sidebar').classList.toggle('collapsed',sidebarCollapsed); }
+function openMobileSidebar(){ document.getElementById('sidebar').classList.add('mobile-open'); document.getElementById('sidebarOverlay').classList.add('active'); }
+function closeMobileSidebar(){ document.getElementById('sidebar').classList.remove('mobile-open'); document.getElementById('sidebarOverlay').classList.remove('active'); }
+
+/* ══════════════════════════════════════════════════════════════
+   AUTH — LOGIN / LOGOUT / SESSION
+══════════════════════════════════════════════════════════════ */
+
+/* Show a loading spinner on the login button */
+function _loginBtnLoading(on) {
+  const btn = document.getElementById('loginBtn');
+  if (!btn) return;
+  btn.disabled = on;
+  btn.textContent = on ? 'جارٍ الدخول...' : 'دخول النظام ←';
+}
+async function doLogin() {
+  const email    = (document.getElementById('loginEmail')?.value    || '').trim();
+  const password = (document.getElementById('loginPassword')?.value || '').trim();
+  const remember = document.getElementById('loginRemember')?.checked ?? true;
+  const err      = document.getElementById('loginErr');
+
+  err.textContent = '';
+
+  if (!email)    { err.textContent = 'أدخل البريد الإلكتروني'; return; }
+  if (!password) { err.textContent = 'أدخل كلمة المرور'; return; }
+  if (!db)       { err.textContent = 'تعذّر الاتصال بالخادم'; return; }
+
+  _loginBtnLoading(true);
+
+  try {
+    const { data, error } = await db.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+
+    // remember-me = off: copy tokens to sessionStorage for tab-scoped persistence.
+    // Do NOT removeItem from _authStorage here — supabase-js still needs it in memory
+    // for the current page's getUser() / getSession() calls to work.
+    // We clear _authStorage only on explicit logout, not here.
+    if (!remember && data.session) {
+      sessionStorage.setItem('ahd_solar_auth', JSON.stringify({
+        access_token:  data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      }));
+      // Mark as session-only so the onload restore knows to use sessionStorage
+      _authStorage.setItem('ahd_solar_remember', 'false');
+    } else {
+      _authStorage.removeItem('ahd_solar_remember');
+    }
+
+    currentUser    = data.user;
+    currentProfile = await loadUserProfile(currentUser.id);
+    await _bootApp();
+
+  } catch(e) {
+    const msg = e.message || '';
+    if (msg.includes('Invalid login') || msg.includes('invalid_credentials')) {
+      err.textContent = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+    } else if (msg.includes('Email not confirmed')) {
+      err.textContent = 'يرجى تأكيد البريد الإلكتروني أولاً';
+    } else if (msg.includes('Too many requests')) {
+      err.textContent = 'محاولات كثيرة — انتظر دقيقة ثم حاول مجدداً';
+    } else {
+      err.textContent = 'خطأ: ' + msg;
+    }
+    console.error('❌ Login failed:', e);
+  } finally {
+    _loginBtnLoading(false);
+  }
+}
+
+
+/* Support Enter-key submission on login form */
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    const ls = document.getElementById('loginScreen');
+    if (ls && ls.style.display !== 'none') doLogin();
+  }
+});
+
+/* Boot the app after a confirmed session */
+async function _bootApp() {
+  if (!currentUser) return;
+
+  // Hide login, show app
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('appScreen').style.display   = 'block';
+
+  // Apply user info to sidebar / topbar
+  applyUserToUI(currentProfile, currentUser);
+
+  // Restore catalog URL
+  const url = _storage.getItem(SCRIPT_KEY) || DEFAULT_SCRIPT_URL;
+  const _sheetEl = document.getElementById('openSheetLink');
+  if (_sheetEl && url.startsWith('https://')) _sheetEl.href = url.replace('/exec','');
+
+  // Load data
+  await loadData();
+  updateDashboardStats();
+  renderClientsTable();
+}
+
+/* Logout */
+async function doLogout() {
+  if (!confirm('تسجيل خروج؟')) return;
+  if (db) {
+    try { await db.auth.signOut(); } catch(e) { console.warn('Sign-out error:', e.message); }
+  }
+  // Clear both storages (supabase-js signOut already cleared 'ahd_solar_sb_auth' via _authStorage internally)
+  sessionStorage.removeItem('ahd_solar_auth');
+  currentUser    = null;
+  currentProfile = null;
+  location.reload();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   APP INIT — check for existing session on page load
+══════════════════════════════════════════════════════════════ */
+window.onload = async function() {
+  try {
+    // Restore theme preference
+    const savedMode = _storage.getItem('ahd_mode');
+    if (savedMode === 'light') {
+      isDarkMode = false;
+      document.body.classList.add('light');
+      const mLabel = document.getElementById('modeLabel');
+      const mIcon  = document.getElementById('modeIcon');
+      if (mLabel) mLabel.textContent = 'الوضع الليلي';
+      if (mIcon)  mIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    }
+
+    // Set dashboard date
+    const today = new Date().toLocaleDateString('ar-EG',{weekday:'long',month:'long',day:'numeric'});
+    const dd = document.getElementById('dashDate');
+    if (dd) dd.textContent = today;
+
+    // Pre-fill URL input
+    const urlInput = document.getElementById('loginUrl');
+    if (urlInput && !urlInput.value) urlInput.value = DEFAULT_SCRIPT_URL;
+
+    // Wire up note type toggle
+    const noteTypeEl = document.getElementById('note_type');
+    if (noteTypeEl) noteTypeEl.addEventListener('change', function() {
+      document.getElementById('reminderDateGroup').style.display = this.value === 'reminder' ? 'flex' : 'none';
+    });
+
+    // Live greeting on email input (optional UX touch)
+    const emailEl = document.getElementById('loginEmail');
+    if (emailEl) emailEl.addEventListener('input', function() {
+      const name = this.value.split('@')[0];
+      const el   = document.getElementById('welcomeEng');
+      if (el) el.textContent = name ? 'يا ' + name : 'بك';
+    });
+
+    // ── SESSION RESTORE ──
+    // Priority 1: remember-me = off → tokens were saved to sessionStorage.
+    //   Restore via setSession(), then clear _authStorage so they don't
+    //   survive a full browser restart.
+    // Priority 2: remember-me = on → supabase-js reads _authStorage directly
+    //   via getSession() (session was persisted there at login).
+    // Priority 3: no session → show login screen, listen for SIGNED_IN.
+    if (db) {
+      const ssKey    = 'ahd_solar_auth';
+      const ssStored = sessionStorage.getItem(ssKey);
+
+      if (ssStored) {
+        // remember-me = off path: restore from sessionStorage
+        try {
+          const parsed = JSON.parse(ssStored);
+          if (parsed?.access_token) {
+            const { data, error } = await db.auth.setSession({
+              access_token:  parsed.access_token,
+              refresh_token: parsed.refresh_token,
+            });
+            if (!error && data?.session) {
+              // Do NOT removeItem('ahd_solar_sb_auth') here — supabase-js needs it
+              // in _authStorage for subsequent getSession() calls within this tab.
+              currentUser    = data.session.user;
+              currentProfile = await loadUserProfile(currentUser.id);
+              await _bootApp();
+              return;
+            }
+          }
+        } catch(e) {
+          console.warn('⚠️ sessionStorage restore failed:', e.message);
+          sessionStorage.removeItem(ssKey);
+        }
+      }
+
+      // remember-me = on path: supabase-js restores from _authStorage automatically
+      try {
+        const { data: { session }, error } = await db.auth.getSession();
+        if (!error && session) {
+          currentUser    = session.user;
+          currentProfile = await loadUserProfile(currentUser.id);
+          await _bootApp();
+          return;
+        }
+      } catch(e) {
+        console.warn('⚠️ getSession failed:', e.message);
+      }
+
+      // No session — register listener then show login screen
+      db.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'SIGNED_IN' && session) {
+          currentUser    = session.user;
+          currentProfile = await loadUserProfile(currentUser.id);
+          const ls = document.getElementById('loginScreen');
+          if (ls && ls.style.display !== 'none') await _bootApp();
+        }
+        if (event === 'SIGNED_OUT') {
+          currentUser = null; currentProfile = null;
+          location.reload();
+        }
+        if (event === 'TOKEN_REFRESHED' && session) {
+          currentUser = session.user;
+        }
+      });
+    }
+
+    console.log('Al-Ahd Solar CRM v2.0 (Phase 2 Auth) loaded');
+  } catch(e) { console.error('❌ Init error:', e); }
+};
+
+/* ══════════════════════════════════════════════════════════════
+   DATA LOADING — CATALOG FROM GOOGLE SHEETS
+   FIX: Robust fetch with CORS mode, timeout, no-cache, proper
+   error distinction between network errors and data errors.
+══════════════════════════════════════════════════════════════ */
+async function loadData(){
+  const url=_storage.getItem(SCRIPT_KEY)||DEFAULT_SCRIPT_URL;
+  const proto=(typeof location!=='undefined')?location.protocol:'';
+  const isRestricted=(proto==='file:'||proto==='about:'||proto==='');
+  if(isRestricted){
+    setLoading(false);
+    showQStatus('error','لتحميل بيانات الأسعار، افتح الملف في المتصفح مباشرة<br><small>اسحب الملف وأفلته على Chrome أو Firefox</small><br><button class="btn btn-primary" onclick="loadData()" style="margin-top:10px">إعادة المحاولة</button>');
+    onLoadedOffline(); return;
+  }
+  setLoading(true);
+  try {
+    const controller=new AbortController();
+    const tid=setTimeout(()=>controller.abort(),20000);
+    // FIX: Use no-store cache and cors mode; Apps Script requires no credentials
+    const res=await fetch(url+'?action=read&t='+Date.now(),{
+      signal:controller.signal, mode:'cors', cache:'no-store',
+      headers:{'Accept':'application/json'}
+    });
+    clearTimeout(tid);
+    if(!res.ok) throw new Error('HTTP '+res.status+' — '+res.statusText);
+    const text=await res.text();
+    let json;
+    try { json=JSON.parse(text); }
+    catch(e){ throw new Error('Invalid JSON from Apps Script'); }
+    if(!json.ok) throw new Error(json.error||'Apps Script returned error');
+    if(!json.catalog||typeof json.catalog!=='object') throw new Error('Catalog missing from response');
+    processCatalog(json.catalog);
+    onLoaded();
+  } catch(e){
+    setLoading(false);
+    const msg=e.name==='AbortError'?'انتهت مهلة الاتصال (20 ثانية)':e.message;
+    showQStatus('error','تعذّر تحميل الأسعار: '+msg+'<br><button class="btn btn-primary" onclick="loadData()" style="margin-top:8px">إعادة المحاولة</button>');
+    console.error('❌ Catalog load failed:', e.message);
+    onLoadedOffline();
+  }
+}
+
+function onLoadedOffline(){
+  const cs=document.getElementById('sbConnStatus');
+  cs.classList.add('offline');
+  document.getElementById('sbConnText').textContent='وضع بدون اتصال';
+  updateDashboardStats(); renderClientsTable();
+  console.warn('📴 Offline mode — catalog not loaded');
+}
+
+function processCatalog(raw){
+  catalog={}; catOrder=Object.keys(raw);
+  catOrder.forEach(k=>{
+    const c=raw[k];
+    catalog[k]={label:c.label||k,icon:c.icon||'📦',unit:c.unit||'وحدة',items:(c.items||[]).filter(it=>it.name&&it.price>0)};
+  });
+  console.log('✅ Catalog Loaded — '+catOrder.length+' categories, '+Object.values(catalog).reduce((s,c)=>s+c.items.length,0)+' products');
+}
+
+function onLoaded(){
+  setLoading(false); hide('quoteStatus');
+  const cs=document.getElementById('sbConnStatus'); cs.classList.remove('offline');
+  document.getElementById('sbConnText').textContent='متصل بالخادم';
+  buildStepsBar(); renderStep(0); renderMasterPreview(); updateLive(); updateProfit(); updateDashboardStats();
+  toast('تم تحميل البيانات بنجاح','success');
+}
+
+function setLoading(on){
+  document.getElementById('loadingBar').classList.toggle('active',on);
+  const ic1=document.getElementById('refreshIcon'); const ic2=document.getElementById('refreshIcon2'); const btn=document.getElementById('refreshBtnTop');
+  if(ic1) ic1.style.animation=on?'spin .7s linear infinite':'';
+  if(ic2) ic2.style.animation=on?'spin .7s linear infinite':'';
+  if(btn) btn.classList.toggle('spinning',on);
+}
+function showQStatus(type,msg){
+  const el=document.getElementById('quoteStatus'); if(!el) return;
+  el.style.display='block';
+  document.getElementById('qsIcon').innerHTML=type==='error'?'<svg viewBox="0 0 24 24" fill="none" stroke="#FF5252" stroke-width="2" width="28" height="28"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.51"/></svg>';
+  // FIX: Sanitize msg with DOMPurify before inserting as innerHTML.
+  // msg can contain e.message from fetch errors which may include HTML characters.
+  const safeMsg = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(msg) : msg;
+  document.getElementById('qsText').innerHTML=safeMsg;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CRM — CLIENTS (Supabase-backed with localStorage fallback)
+══════════════════════════════════════════════════════════════ */
+function openAddClientModal(){
+  document.getElementById('clientModalTitle').textContent='إضافة عميل جديد';
+  document.getElementById('editClientId').value='';
+  ['cm_name','cm_phone','cm_whatsapp','cm_email','cm_address','cm_notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('cm_governorate').value='';
+  document.getElementById('cm_source').value='';
+  document.getElementById('cm_status').value='new';
+  openModal('clientModal');
+}
+
+async function openEditClientModal(cid){
+  if(!cid){ toast('لا يوجد عميل محدد','warn'); return; }
+  const clients=await getClients();
+  const client=clients.find(c=>String(c.id)===String(cid));
+  if(!client){ toast('لم يتم العثور على العميل','error'); return; }
+  document.getElementById('clientModalTitle').textContent='تعديل بيانات العميل';
+  document.getElementById('editClientId').value=cid;
+  document.getElementById('cm_name').value=client.name||'';
+  document.getElementById('cm_phone').value=client.phone||'';
+  document.getElementById('cm_whatsapp').value=client.whatsapp||'';
+  document.getElementById('cm_email').value=client.email||'';
+  document.getElementById('cm_governorate').value=client.governorate||'';
+  document.getElementById('cm_address').value=client.address||'';
+  document.getElementById('cm_source').value=client.source||'';
+  document.getElementById('cm_status').value=client.status||'new';
+  document.getElementById('cm_notes').value=client.notes||'';
+  openModal('clientModal');
+}
+
+async function saveClient(){
+  const name=document.getElementById('cm_name').value.trim();
+  if(!name){ toast('أدخل اسم العميل','warn'); return; }
+  const editId=document.getElementById('editClientId').value;
+  const data={
+    name, phone:document.getElementById('cm_phone').value.trim(),
+    whatsapp:document.getElementById('cm_whatsapp').value.trim(),
+    email:document.getElementById('cm_email').value.trim(),
+    governorate:document.getElementById('cm_governorate').value,
+    address:document.getElementById('cm_address').value.trim(),
+    source:document.getElementById('cm_source').value,
+    status:document.getElementById('cm_status').value,
+    notes:document.getElementById('cm_notes').value.trim(),
+    updatedAt:new Date().toLocaleString('ar-EG')
+  };
+
+  // Try Supabase first
+  const sbResult=await saveClientToSupabase(data, editId);
+
+  // Always keep localStorage in sync as backup
+  const clients=getClientsSync();
+  if(editId){
+    const idx=clients.findIndex(c=>String(c.id)===String(editId));
+    if(idx>=0){ clients[idx]={...clients[idx],...data}; if(sbResult) clients[idx].id=sbResult.id; }
+  } else {
+    data.id=sbResult?.id||genId();
+    data.createdAt=new Date().toLocaleString('ar-EG');
+    clients.unshift(data);
+  }
+  saveClientsSync(clients);
+  closeModal('clientModal');
+  renderClientsTable();
+  updateDashboardStats();
+  if(editId && currentClientId===String(editId)) renderClientDetail(editId);
+  toast(editId?'تم تحديث بيانات العميل':'تمت إضافة العميل بنجاح','success');
+  console.log('✅ Customer Saved');
+}
+
+async function deleteClient(cid){
+  if(!confirm('حذف هذا العميل وجميع ملاحظاته؟')) return;
+  try {
+    await deleteClientFromSupabase(cid);
+  } catch(e){}
+  let clients=getClientsSync();
+  clients=clients.filter(c=>String(c.id)!==String(cid));
+  saveClientsSync(clients);
+  // Delete associated notes from Supabase
+  await deleteClientNotes(cid);
+  renderClientsTable(); updateDashboardStats(); toast('تم حذف العميل','info');
+}
+
+async function updateClientStatus(cid,status){
+  try { await updateStatusInSupabase(cid, status); } catch(e){}
+  const clients=getClientsSync();
+  const idx=clients.findIndex(c=>String(c.id)===String(cid));
+  if(idx>=0){ clients[idx].status=status; clients[idx].updatedAt=new Date().toLocaleString('ar-EG'); saveClientsSync(clients); }
+  renderClientsTable(); updateDashboardStats();
+  if(String(currentClientId)===String(cid)) renderClientDetail(cid);
+}
+
+async function renderClientsTable(){
+  const search=(document.getElementById('clientSearch')?.value||'').trim().toLowerCase();
+  const statusFilter=document.getElementById('statusFilter')?.value||'';
+  const sortFilter=document.getElementById('sortFilter')?.value||'newest';
+  let clients=await getClients();
+  if(statusFilter) clients=clients.filter(c=>c.status===statusFilter);
+  if(search) clients=clients.filter(c=>(c.name+c.phone+c.governorate+c.source).toLowerCase().includes(search));
+  if(sortFilter==='name') clients.sort((a,b)=>(a.name||'').localeCompare(b.name||'','ar'));
+  else if(sortFilter==='oldest') clients.sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||''));
+  else if(sortFilter==='status') clients.sort((a,b)=>Object.keys(STATUS_LABELS).indexOf(a.status)-Object.keys(STATUS_LABELS).indexOf(b.status));
+  const history=await getHistory();
+  const tbody=document.getElementById('clientsTableBody');
+  if(!tbody) return;
+  if(!clients.length){
+    tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><div class="empty-state-title">لا يوجد عملاء</div><div style="font-size:12px;color:var(--text-muted)">اضغط "عميل جديد" لإضافة أول عميل</div></div></td></tr>`;
+    return;
+  }
+  tbody.innerHTML=clients.map(c=>{
+    const cq=history.filter(h=>String(h.clientId)===String(c.id));
+    const initials=(c.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('');
+    const wa=(c.whatsapp||c.phone||'').replace(/^0/,'');
+    return `<tr>
+      <td><div class="client-name-cell" onclick="openClientDetail('${esc(c.id)}')">
+        <div class="client-avatar">${esc(initials)}</div>
+        <div><div class="client-name-text">${esc(c.name)}</div><div class="client-phone-text">${esc(c.phone)||'—'}</div></div>
+      </div></td>
+      <td><div style="font-size:12px">${esc(c.phone)||'—'}</div>${c.whatsapp?`<div style="font-size:10px;color:var(--green);margin-top:2px">WA: ${esc(c.whatsapp)}</div>`:''}</td>
+      <td style="font-size:12px">${esc(c.governorate)||'—'}</td>
+      <td style="font-size:11.5px;color:var(--text-secondary)">${esc(c.source)||'—'}</td>
+      <td><select class="crm-filter-select" style="font-size:11px;padding:5px 8px" onchange="updateClientStatus('${esc(c.id)}',this.value)">
+        ${Object.entries(STATUS_LABELS).map(([k,v])=>`<option value="${k}" ${c.status===k?'selected':''}>${v}</option>`).join('')}
+      </select></td>
+      <td style="text-align:center;font-size:12px;color:var(--gold);font-weight:700">${cq.length}</td>
+      <td style="font-size:10.5px;color:var(--text-muted)">${esc(c.createdAt)||'—'}</td>
+      <td><div class="table-actions">
+        <button class="tbl-btn" onclick="openClientDetail('${esc(c.id)}')" title="عرض"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <button class="tbl-btn" onclick="openEditClientModal('${esc(c.id)}')" title="تعديل"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+        <button class="tbl-btn green" onclick="startQuoteForClient('${esc(c.id)}')" title="إنشاء عرض"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>
+        ${wa?`<button class="tbl-btn" onclick="window.open('https://wa.me/2${esc(wa)}','_blank')" title="واتساب"><svg viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>`:''}
+        <button class="tbl-btn danger" onclick="deleteClient('${esc(c.id)}')" title="حذف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+async function openClientDetail(cid){
+  currentClientId=cid;
+  await renderClientDetail(cid);
+  switchTab('clientDetail');
+}
+
+async function renderClientDetail(cid){
+  const clients=await getClients();
+  const client=clients.find(c=>String(c.id)===String(cid));
+  if(!client) return;
+  const history=await getHistory();
+  const clientQuotes=history.filter(h=>String(h.clientId)===String(cid));
+  const notes=await getNotes(cid);
+  const initials=(client.name||'?').split(' ').map(w=>w[0]).slice(0,2).join('');
+  const totalVal=clientQuotes.reduce((s,q)=>s+(q.fin||0),0);
+  const notesHTML = await renderNotesHTML(cid);
+  document.getElementById('clientDetailContent').innerHTML=`
+  <div class="client-hero">
+    <div class="hero-avatar">${esc(initials)}</div>
+    <div class="hero-info">
+      <div class="hero-name">${esc(client.name)}</div>
+      ${statusBadge(client.status)}
+      <div class="hero-meta">
+        ${client.phone?`<span>${esc(client.phone)}</span>`:''}
+        ${client.governorate?`<span>${esc(client.governorate)}</span>`:''}
+        ${client.source?`<span>${esc(client.source)}</span>`:''}
+        <span style="color:var(--gold);font-weight:700">${clientQuotes.length} عرض | ${fmt(Math.round(totalVal))} ج.م</span>
+      </div>
+    </div>
+  </div>
+  <div class="detail-tabs">
+    <button class="detail-tab active" onclick="showDetailTab('info','${esc(cid)}',this)">📋 البيانات</button>
+    <button class="detail-tab" onclick="showDetailTab('quotes','${esc(cid)}',this)">📄 العروض (${clientQuotes.length})</button>
+    <button class="detail-tab" onclick="showDetailTab('notes','${esc(cid)}',this)">📝 الملاحظات (${notes.length})</button>
+    <button class="detail-tab" onclick="showDetailTab('status','${esc(cid)}',this)">🔄 تغيير الحالة</button>
+  </div>
+  <div id="detail-tab-info">
+    <div class="card">
+      <div class="card-title">بيانات الاتصال والموقع</div>
+      <div class="info-grid">
+        <div class="info-item"><div class="info-label">الاسم</div><div class="info-value">${esc(client.name)||'—'}</div></div>
+        <div class="info-item"><div class="info-label">الهاتف</div><div class="info-value phone">${esc(client.phone)||'—'}</div></div>
+        <div class="info-item"><div class="info-label">واتساب</div><div class="info-value phone">${esc(client.whatsapp)||'—'}</div></div>
+        <div class="info-item"><div class="info-label">البريد الإلكتروني</div><div class="info-value">${esc(client.email)||'—'}</div></div>
+        <div class="info-item"><div class="info-label">المحافظة</div><div class="info-value">${esc(client.governorate)||'—'}</div></div>
+        <div class="info-item"><div class="info-label">العنوان</div><div class="info-value">${esc(client.address)||'—'}</div></div>
+        <div class="info-item"><div class="info-label">مصدر العميل</div><div class="info-value">${esc(client.source)||'—'}</div></div>
+        <div class="info-item"><div class="info-label">تاريخ الإضافة</div><div class="info-value">${esc(client.createdAt)||'—'}</div></div>
+      </div>
+      ${client.notes?`<div style="margin-top:12px;padding:12px;background:var(--glass-bg2);border-radius:var(--r-md);font-size:12.5px;color:var(--text-secondary);line-height:1.7">${esc(client.notes)}</div>`:''}
+    </div>
+  </div>
+  <div id="detail-tab-quotes" style="display:none">
+    ${clientQuotes.length?clientQuotes.map(q=>`
+    <div class="quote-list-item" onclick="reloadQ_byId('${esc(q.quoteNo)}')">
+      <div class="qli-header"><span class="qli-no">${esc(q.quoteNo)}</span><span class="qli-date">${esc(q.today)}</span></div>
+      <div class="qli-body">
+        <span class="qli-val">${fmt(Math.round(q.fin||0))} ج.م</span>
+        ${q.kw>0?`<span class="qli-kw">⚡ ${q.kw.toFixed(2)} kW</span>`:''}
+        <span class="qli-items">${(q.lineItems||[]).length} بند</span>
+        <span style="margin-right:auto;display:flex;gap:6px">
+          <button class="tbl-btn" onclick="event.stopPropagation();reloadPDF_byNo('${esc(q.quoteNo)}')" title="PDF"><svg viewBox="0 0 24 24" fill="none" stroke="#FF8080" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></button>
+          <button class="tbl-btn" onclick="event.stopPropagation();reloadWA_byNo('${esc(q.quoteNo)}')" title="واتساب"><svg viewBox="0 0 24 24" fill="none" stroke="#25D366" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></button>
+        </span>
+      </div>
+    </div>`).join(''):'<div class="empty-state"><div class="empty-state-title">لا توجد عروض لهذا العميل</div></div>'}
+  </div>
+  <div id="detail-tab-notes" style="display:none">
+    <div class="action-row" style="margin-bottom:14px">
+      <button class="btn btn-primary" onclick="openAddNoteModal('${esc(cid)}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        إضافة ملاحظة / تذكير
+      </button>
+    </div>
+    <div id="notesListForClient">${notesHTML}</div>
+  </div>
+  <div id="detail-tab-status" style="display:none">
+    <div class="card">
+      <div class="card-title">تغيير حالة العميل</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        ${Object.entries(STATUS_LABELS).map(([k,v])=>`<button onclick="updateClientStatus('${esc(cid)}','${k}')" class="btn ${client.status===k?'btn-primary':''}" style="justify-content:center;font-size:13px;padding:14px;font-family:'Tajawal',sans-serif;font-weight:700">${v} ${client.status===k?'✓':''}</button>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+async function renderNotesHTML(cid){
+  const notes = await getNotes(cid);
+  const sorted = notes.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+  if(!sorted.length) return '<div class="empty-state"><div class="empty-state-title">لا توجد ملاحظات</div></div>';
+  const now=new Date();
+  return sorted.map(n=>{
+    const typeMap={note:'📝 ملاحظة',call:'📞 مكالمة',meet:'🤝 اجتماع',reminder:'⏰ تذكير'};
+    const typeClass={note:'note',call:'call',meet:'meet',reminder:'reminder'};
+    let reminderHTML='';
+    if(n.type==='reminder'&&n.reminderDate){
+      const rd=new Date(n.reminderDate); const isDue=rd<=now; const isDone=n.done;
+      const badgeClass=isDone?'reminder-done':isDue?'reminder-due':'reminder-upcoming';
+      const badgeText=isDone?'تم ✓':isDue?'متأخر!':rd.toLocaleDateString('ar-EG',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+      reminderHTML=`<span class="reminder-badge ${badgeClass}">${badgeText}</span>`;
+      if(!isDone) reminderHTML+=`<button class="btn btn-success" style="font-size:10px;padding:4px 10px;margin-right:6px" onclick="markReminderDone('${esc(n.id)}','${esc(cid)}')">تم ✓</button>`;
+    }
+    return `<div class="note-item">
+      <div class="note-header"><span class="note-type ${typeClass[n.type]||'note'}">${typeMap[n.type]||'ملاحظة'}</span><span class="note-time">${esc(n.createdAt)}</span></div>
+      <div class="note-body">${esc(n.text)}</div>
+      ${reminderHTML?`<div class="note-actions">${reminderHTML}</div>`:''}
+      <div class="note-actions" style="margin-top:6px"><button class="tbl-btn danger" onclick="deleteNote('${esc(n.id)}','${esc(cid)}')" title="حذف"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div>
+    </div>`;
+  }).join('');
+}
+
+function showDetailTab(tab,cid,btn){
+  ['info','quotes','notes','status'].forEach(t=>{ const el=document.getElementById('detail-tab-'+t); if(el) el.style.display=t===tab?'block':'none'; });
+  document.querySelectorAll('.detail-tab').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+}
+
+/* ══ NOTES ══ */
+function openAddNoteModal(cid){
+  document.getElementById('noteClientId').value=cid;
+  document.getElementById('note_type').value='note';
+  document.getElementById('note_text').value='';
+  document.getElementById('note_reminder_date').value='';
+  document.getElementById('reminderDateGroup').style.display='none';
+  openModal('noteModal');
+}
+async function saveNote(){
+  const cid=document.getElementById('noteClientId').value;
+  const text=document.getElementById('note_text').value.trim();
+  if(!text){ toast('اكتب نص الملاحظة','warn'); return; }
+  const note={clientId:cid,type:document.getElementById('note_type').value,text,reminderDate:document.getElementById('note_reminder_date').value||null,done:false};
+  try {
+    await saveNoteToDB(note);
+  } catch(e){ toast('خطأ في حفظ الملاحظة','error'); console.error(e); return; }
+  closeModal('noteModal');
+  if(String(currentClientId)===String(cid)){
+    const el=document.getElementById('notesListForClient');
+    if(el){ el.innerHTML='<div class="status-msg">جاري التحميل...</div>'; el.innerHTML=await renderNotesHTML(cid); }
+  }
+  updateDashboardStats();
+  toast('تمت إضافة الملاحظة','success');
+}
+async function deleteNote(nid,cid){
+  try{ await deleteNoteFromDB(nid); }catch(e){ toast('خطأ في الحذف','error'); return; }
+  const el=document.getElementById('notesListForClient');
+  if(el) el.innerHTML=await renderNotesHTML(cid);
+  updateDashboardStats(); toast('تم حذف الملاحظة','info');
+}
+async function markReminderDone(nid,cid){
+  try{ await markNoteReminderDoneInDB(nid); }catch(e){ toast('خطأ في التحديث','error'); return; }
+  const el=document.getElementById('notesListForClient');
+  if(el) el.innerHTML=await renderNotesHTML(cid);
+  updateDashboardStats(); toast('تم تحديد التذكير كمنجز','success');
+}
+
+/* ══ CLIENT—QUOTE LINK ══ */
+async function populateLinkClientSelect(){
+  const sel=document.getElementById('linkClientSelect'); if(!sel) return;
+  const clients=await getClients();
+  sel.innerHTML='<option value="">— اختر عميل من القاعدة (اختياري) —</option>';
+  clients.forEach(c=>{const opt=document.createElement('option'); opt.value=c.id; opt.textContent=(c.name||'')+(c.phone?' — '+c.phone:''); sel.appendChild(opt);});
+}
+async function linkClientToQuote(cid){
+  if(!cid) return;
+  const clients=await getClients(); const client=clients.find(c=>String(c.id)===String(cid)); if(!client) return;
+  document.getElementById('cName').value=client.name||'';
+  document.getElementById('cAddr').value=(client.governorate?client.governorate+' — ':'')+( client.address||'');
+  document.getElementById('cPhone').value=client.phone||'';
+  quotingForClientId=cid;
+  toast('تم ربط العميل بالعرض','success');
+}
+async function startQuoteForClient(cid){
+  quotingForClientId=cid;
+  const clients=await getClients(); const client=clients.find(c=>String(c.id)===String(cid)); if(!client) return;
+  document.getElementById('cName').value=client.name||'';
+  document.getElementById('cAddr').value=(client.governorate?client.governorate+' — ':'')+( client.address||'');
+  document.getElementById('cPhone').value=client.phone||'';
+  await populateLinkClientSelect();
+  document.getElementById('linkClientSelect').value=cid;
+  switchTab('quote');
+  toast('جاهز لإنشاء عرض سعر لـ '+client.name,'info');
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DASHBOARD STATS — Supabase + localStorage
+══════════════════════════════════════════════════════════════ */
+async function updateDashboardStats(){
+  const now=new Date();
+
+  // Try Supabase for all live stats
+  const sbStats=await getSupabaseStats();
+  let clientCount=0, soldCount=0, followupCount=0, quoteCount=0;
+  if(sbStats){
+    clientCount=sbStats.total; soldCount=sbStats.sold; followupCount=sbStats.followups;
+    quoteCount=sbStats.quotes||0;
+  } else {
+    const clients=getClientsSync();
+    clientCount=clients.length;
+    soldCount=clients.filter(c=>c.status==='sold').length;
+    followupCount=clients.filter(c=>['followup','negotiation','interested'].includes(c.status)).length;
+    const hist=_lsGet(HISTORY_KEY,[]);
+    quoteCount=hist.length;
+  }
+
+  const elCl=document.getElementById('statTotalClients'); if(elCl) elCl.textContent=clientCount;
+  const elQ=document.getElementById('statTotalQuotes'); if(elQ) elQ.textContent=quoteCount;
+  const elSold=document.getElementById('statSold'); if(elSold) elSold.textContent=soldCount;
+  const elFu=document.getElementById('statFollowups'); if(elFu) elFu.textContent=followupCount;
+
+  const badge=document.getElementById('sbHistBadge');
+  if(quoteCount>0){ badge.style.display='inline-block'; badge.textContent=quoteCount; } else { badge.style.display='none'; }
+  const cbadge=document.getElementById('sbClientsBadge');
+  if(clientCount>0){ cbadge.style.display='inline-block'; cbadge.textContent=clientCount; } else { cbadge.style.display='none'; }
+
+  // Dashboard reminders — load from Supabase
+  const allNotes = await getNotes();
+  const upcomingR=allNotes.filter(n=>n.type==='reminder'&&!n.done&&n.reminderDate&&new Date(n.reminderDate)<=new Date(now.getTime()+7*24*60*60*1000));
+  const el_rem=document.getElementById('dashReminders');
+  if(el_rem){
+    if(!upcomingR.length){ el_rem.innerHTML='<div class="empty-state" style="padding:20px"><div>لا يوجد تذكيرات قادمة</div></div>'; }
+    else {
+      const clients=getClientsSync(); const cliMap={};
+      clients.forEach(c=>{cliMap[String(c.id)]=c;});
+      el_rem.innerHTML=upcomingR.slice(0,5).map(n=>{
+        const cl=cliMap[String(n.clientId)]; const rd=new Date(n.reminderDate); const isDue=rd<=now;
+        return `<div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-md);background:var(--glass-bg);border:1px solid ${isDue?'rgba(255,82,82,0.2)':'rgba(245,200,66,0.15)'};margin-bottom:8px;cursor:pointer" onclick="openClientDetail('${esc(n.clientId)}')">
+          <div style="width:36px;height:36px;border-radius:10px;background:${isDue?'rgba(255,82,82,0.1)':'rgba(245,200,66,0.1)'};display:flex;align-items:center;justify-content:center;flex-shrink:0">⏰</div>
+          <div style="flex:1">
+            <div style="font-size:12.5px;font-weight:700;color:var(--text-primary)">${esc(n.text.slice(0,60))}${n.text.length>60?'...':''}</div>
+            <div style="font-size:10px;color:var(--text-secondary);margin-top:2px">${cl?esc(cl.name):'عميل'} — ${rd.toLocaleDateString('ar-EG',{month:'short',day:'numeric'})}</div>
+          </div>
+          <span class="reminder-badge ${isDue?'reminder-due':'reminder-upcoming'}">${isDue?'الآن':rd.toLocaleDateString('ar-EG',{month:'short',day:'numeric'})}</span>
+        </div>`;
+      }).join('');
+    }
+  }
+}
+
+/* ══ MODALS ══ */
+function openModal(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.modal-overlay').forEach(m=>{ m.addEventListener('click',function(e){ if(e.target===this) closeModal(this.id); }); });
+
+/* ══ NAVIGATION ══ */
+const pageNames={dashboard:'لوحة التحكم',clients:'العملاء',clientDetail:'تفاصيل العميل',quote:'عرض السعر',master:'قائمة الأسعار',history:'سجل العروض',summary:'ملخص العرض'};
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>{ p.style.display='none'; p.classList.remove('active'); });
+  const pg=document.getElementById('page-'+name);
+  if(pg){ pg.style.display='block'; pg.classList.add('active'); }
+  const pn=document.getElementById('topbarPageName'); if(pn) pn.textContent=pageNames[name]||name;
+}
+function updateSidebarActive(tab){
+  document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
+  const sb=document.getElementById('sb-'+tab); if(sb) sb.classList.add('active');
+}
+function switchTab(tab){
+  updateSidebarActive(tab); showPage(tab);
+  if(tab==='history') renderHistory();
+  if(tab==='clients') renderClientsTable();
+  if(tab==='quote') populateLinkClientSelect();
+  closeMobileSidebar();
+}
+function backToQuote(){ showPage('quote'); updateSidebarActive('quote'); }
+
+/* ══ QUOTE HISTORY HELPERS ══ */
+async function reloadQ_byId(quoteNo){ const h=await getHistory(); const q=h.find(x=>x.quoteNo===quoteNo); if(q){ lastQ=q; document.getElementById('summaryContent').innerHTML=buildSummaryHTML(lastQ); showPage('summary'); updateSidebarActive('summary'); } }
+async function reloadPDF_byNo(quoteNo){ const h=await getHistory(); const q=h.find(x=>x.quoteNo===quoteNo); if(q){ lastQ=q; await generatePDF(); } }
+async function reloadWA_byNo(quoteNo){ const h=await getHistory(); const q=h.find(x=>x.quoteNo===quoteNo); if(q){ lastQ=q; shareWhatsApp(); } }
+
+/* ══ CATALOG STEPS ══ */
+function getCatSVG(icon){
+  const iconMap={'☀️':'<circle cx="12" cy="12" r="5"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke-linecap="round"/>','⚡':'<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>','🔋':'<rect x="6" y="6" width="12" height="12" rx="1"/><path d="M10 6V4M14 6V4M6 12h12"/>','🔌':'<path d="M12 22V12M5 12H2a10 10 0 0 0 20 0h-3M12 2v4M8 6h8"/>','📦':'<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>','🔩':'<circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>','🛡️':'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>','🔧':'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>','default':'<rect x="3" y="3" width="18" height="18" rx="2"/>'};
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">${iconMap[icon]||iconMap['default']}</svg>`;
+}
+function buildStepsBar(){
+  const bar=document.getElementById('stepsBar'); if(!bar) return; bar.innerHTML='';
+  catOrder.forEach((k,i)=>{
+    const c=catalog[k]; const sel=(selections[k]||[]).length;
+    const btn=document.createElement('button');
+    btn.className='step-pill'+(i===currentStep?' active':sel>0?' done':'');
+    btn.innerHTML=getCatSVG(c.icon)+'<span>'+c.label+'</span>'+(sel>0?`<span class="step-badge">${sel}</span>`:'');
+    btn.onclick=()=>renderStep(i); bar.appendChild(btn);
+  });
+}
+function renderStep(idx){
+  currentStep=idx;
+  const k=catOrder[idx]; const cat=catalog[k]; const items=cat.items||[];
+  document.getElementById('stepTitle').innerHTML=`<div class="ct-icon">${getCatSVG(cat.icon)}</div> ${cat.label}`;
+  buildStepsBar();
+  const grid=document.getElementById('itemsGrid'); grid.innerHTML='';
+  if(!items.length){
+    grid.innerHTML='<div class="status-msg"><div class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div><div>لا توجد منتجات</div></div>';
+  } else {
+    items.forEach(item=>{
+      const selList=selections[k]||[];
+      const selItem=selList.find(s=>s.id===item.id);
+      const isSel=!!selItem; const qty=selItem?.qty||1;
+      const spec=item.spec||(item.watts?item.watts+'W':'')|| (item.kw?item.kw+' kW':'')|| (item.kwh?item.kwh+' kWh':'')||'';
+      const sellUnit=item.price;
+      const card=document.createElement('div');
+      card.className='item-card'+(isSel?' selected':'');
+      card.innerHTML=`
+        <span class="item-check"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span>
+        <div class="item-icon">${getCatSVG(cat.icon)}</div>
+        <div class="item-name">${esc(item.name)}</div>
+        ${spec?`<div class="item-spec">${esc(spec)}</div>`:''}
+        <div class="item-sell-price">${fmt(sellUnit)} ج.م</div>
+        <div class="item-unit">لكل ${esc(item.unit||cat.unit)}</div>
+        ${isSel?`<div class="qty-row" onclick="event.stopPropagation()">
+          <button class="qty-btn" onclick="changeQty('${k}','${item.id}',-1,event)">−</button>
+          <input class="qty-input" type="number" min="1" value="${qty}" onchange="setQty('${k}','${item.id}',this.value)" onclick="event.stopPropagation()"/>
+          <button class="qty-btn" onclick="changeQty('${k}','${item.id}',1,event)">+</button>
+          <span class="qty-total">${fmt(sellUnit*qty)} ج.م</span>
+        </div>`:''}`;
+      card.onclick=()=>toggleItem(k,item);
+      grid.appendChild(card);
+    });
+  }
+  document.getElementById('prevBtn').disabled=(idx===0);
+  const nb=document.getElementById('nextBtn');
+  if(idx===catOrder.length-1){ nb.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> عرض السعر النهائي'; nb.className='btn btn-success'; nb.onclick=showSummary; }
+  else { nb.innerHTML='التالي <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><polyline points="9 18 15 12 9 6"/></svg>'; nb.className='btn btn-primary'; nb.onclick=nextStep; }
+}
+function prevStep(){ if(currentStep>0) renderStep(currentStep-1); }
+function nextStep(){ if(currentStep<catOrder.length-1) renderStep(currentStep+1); }
+function toggleItem(catKey,item){
+  if(!selections[catKey]) selections[catKey]=[];
+  const idx=selections[catKey].findIndex(s=>s.id===item.id);
+  if(idx>=0) selections[catKey].splice(idx,1);
+  else selections[catKey].push({...item,qty:1});
+  renderStep(currentStep); updateLive(); updateProfit();
+}
+function setQty(catKey,itemId,val){
+  const item=selections[catKey]?.find(s=>s.id===itemId);
+  if(item) item.qty=Math.max(1,parseInt(val)||1);
+  updateLive(); updateProfit(); buildStepsBar();
+}
+function changeQty(catKey,itemId,delta,e){
+  e.stopPropagation();
+  const item=selections[catKey]?.find(s=>s.id===itemId);
+  if(item){ item.qty=Math.max(1,(item.qty||1)+delta); renderStep(currentStep); updateLive(); updateProfit(); buildStepsBar(); }
+}
+
+/* ══ CALCULATIONS ══ */
+function calcTotals(){
+  let sub=0;
+  Object.values(selections).forEach(arr=>arr.forEach(s=>{sub+=s.price*(s.qty||1);}));
+  let totalW=0;
+  const PANEL_HINTS=['panel','solar','لوح','الالواح','الألواح','modules','pv'];
+  Object.entries(selections).forEach(([k,arr])=>{
+    const cat=catalog[k]||{}; const label=(cat.label||'').toLowerCase(); const key=k.toLowerCase();
+    const isPanel=PANEL_HINTS.some(h=>key.includes(h)||label.includes(h));
+    if(isPanel){ arr.forEach(s=>{totalW+=(parseFloat(s.watts)||parseFloat(s.kw||0)*1000)*(s.qty||1);}); }
+  });
+  if(totalW===0){ Object.values(selections).forEach(arr=>arr.forEach(s=>{ const w=parseFloat(s.watts)||0; if(w>0) totalW+=w*(s.qty||1); })); }
+  const kw=totalW/1000;
+  const mPerKw=parseFloat(document.getElementById('marginPerKw')?.value)||0;
+  const mPct=parseFloat(document.getElementById('marginPct')?.value)||0;
+  const cost=parseFloat(document.getElementById('costInput')?.value)||0;
+  let finalBase=sub;
+  if(mPerKw>0&&kw>0) finalBase=sub+(mPerKw*kw);
+  else if(mPct>0&&cost>0) finalBase=cost*(1+mPct/100);
+  const disc=parseFloat(document.getElementById('discountInput')?.value)||0;
+  const manualPrice=parseFloat(document.getElementById('finalClientPrice')?.value)||0;
+  const fin=manualPrice>0?manualPrice:Math.max(0,finalBase-disc);
+  const gp=parseFloat(document.getElementById('gridPrice')?.value)||0;
+  const mp=kw*120; const ms=mp*gp;
+  const pb=ms>0?fin/(ms*12):null;
+  return {sub,finalBase,disc,fin,kw,mp,ms,pb,gp,cost};
+}
+function updateLive(){
+  const {fin,kw}=calcTotals();
+  document.getElementById('liveTotal').textContent=fmt(Math.round(fin))+' ج.م';
+  if(kw>0){ show('liveKwWrap'); document.getElementById('liveKw').textContent=kw.toFixed(2)+' kW'; show('livePpwWrap'); document.getElementById('livePpw').textContent=fmt(Math.round(fin/kw))+' ج.م/kW'; }
+  else { hide('liveKwWrap'); hide('livePpwWrap'); }
+  updateProfit();
+}
+function updateProfit(){
+  const {fin,kw,cost}=calcTotals();
+  const profit=fin-cost; const profitPct=cost>0?(profit/cost*100).toFixed(1):0;
+  const pc=profit>=0?'profit-c':'loss-c';
+  const row=document.getElementById('ppCalcRow'); if(!row) return;
+  row.innerHTML=`
+    <div class="pp-stat"><div class="lbl">سعر البيع للعميل</div><div class="val">${fmt(Math.round(fin))} ج.م</div></div>
+    <div class="pp-stat"><div class="lbl">تكلفتي</div><div class="val">${fmt(Math.round(cost))} ج.م</div></div>
+    <div class="pp-stat"><div class="lbl">ربحي الصافي</div><div class="val ${pc}">${fmt(Math.round(profit))} ج.م</div></div>
+    <div class="pp-stat"><div class="lbl">نسبة الربح</div><div class="val ${pc}">${profitPct}%</div></div>
+    ${kw>0?`<div class="pp-stat"><div class="lbl">ربح/kW</div><div class="val ${pc}">${fmt(Math.round(profit/kw))} ج.م</div></div>`:''}`;
+  if(cost>0){ show('liveProfitWrap'); const el=document.getElementById('liveProfit'); el.textContent=fmt(Math.round(profit))+' ج.م'; el.style.color=profit>=0?'var(--orange)':'var(--red)'; }
+  else { hide('liveProfitWrap'); }
+}
+
+/* ══ WARRANTY ══ */
+const WARRANTIES=[{icon:'panel',label:'الألواح الشمسية',years:30},{icon:'frame',label:'الشاسيه (الهيكل)',years:10},{icon:'bolt',label:'الإنفرتر',years:2},{icon:'cable',label:'الكابلات والتوصيلات',years:5}];
+const warrantyIcons={panel:'<svg viewBox="0 0 24 24" fill="none" stroke="#4C9BFF" stroke-width="2" width="20" height="20"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',frame:'<svg viewBox="0 0 24 24" fill="none" stroke="#4C9BFF" stroke-width="2" width="20" height="20"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18M15 3v18"/></svg>',bolt:'<svg viewBox="0 0 24 24" fill="none" stroke="#4C9BFF" stroke-width="2" width="20" height="20"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>',cable:'<svg viewBox="0 0 24 24" fill="none" stroke="#4C9BFF" stroke-width="2" width="20" height="20"><path d="M5 12H2M22 12h-3M12 5V2M12 22v-3"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="3"/></svg>'};
+function warrantyHTML(){ return `<div class="warranty-grid">${WARRANTIES.map(w=>`<div class="w-box"><div class="w-icon">${warrantyIcons[w.icon]||warrantyIcons.panel}</div><div class="w-label">${w.label}</div><div class="w-years">${w.years}</div><div class="w-unit">سنة ضمان</div></div>`).join('')}</div>`; }
+
+/* ══ SUMMARY ══ */
+function showSummary(){
+  const t=calcTotals();
+  const today=new Date().toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  const validUntil=new Date(Date.now()+24*60*60*1000).toLocaleDateString('ar-EG',{year:'numeric',month:'long',day:'numeric'});
+  const quoteNo='SOL-'+Date.now().toString().slice(-6);
+  const lineItems=[];
+  catOrder.forEach(k=>(selections[k]||[]).forEach(s=>lineItems.push({...s,catLabel:catalog[k].label,total:s.price*(s.qty||1)})));
+  lastQ={quoteNo,today,validUntil,clientId:quotingForClientId||null,
+    cn:document.getElementById('cName').value||'—',
+    ca:document.getElementById('cAddr').value||'—',
+    cp:document.getElementById('cPhone').value||'—',
+    ce:document.getElementById('cEng').value||'—',
+    lineItems,...t};
+  document.getElementById('summaryContent').innerHTML=buildSummaryHTML(lastQ);
+  showPage('summary');
+  console.log('✅ Quote Generated:', quoteNo);
+}
+
+function buildSummaryHTML(d){
+  const rows=d.lineItems.map(li=>`<tr><td style="color:var(--text-secondary);font-size:10px">${esc(li.catLabel)}</td><td style="font-weight:600">${esc(li.name)}</td><td style="text-align:center">${li.qty||1}</td><td style="color:var(--green);font-weight:700">${fmt(li.total)} ج.م</td></tr>`).join('');
+  return `
+  <div class="summary-hero">
+    <div class="sh-badge">عرض سعر رسمي</div>
+    <div class="sh-company">العهد سولار</div>
+    <div class="sh-sub">AL-AHD SOLAR — SOLAR ENERGY SYSTEMS</div>
+    <div class="sh-title">عرض سعر منظومة طاقة شمسية</div>
+    <div class="sh-meta">رقم العرض: ${esc(d.quoteNo)} &nbsp;|&nbsp; ${esc(d.today)}</div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#F5C842" stroke-width="2" width="15" height="15"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div> بيانات العميل</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      ${[['اسم العميل',d.cn],['العنوان',d.ca],['الهاتف',d.cp],['مهندس المبيعات',d.ce]].map(([l,v])=>`<div style="background:var(--glass-bg2);border-radius:10px;padding:10px 13px;border:1px solid var(--glass-border)"><div style="color:var(--text-secondary);font-size:9.5px">${l}</div><div style="color:var(--text-primary);font-weight:600;font-size:13px;margin-top:3px">${esc(v)}</div></div>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title"><div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#F5C842" stroke-width="2" width="15" height="15"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div> تفاصيل المنظومة</div>
+    <div style="overflow-x:auto"><table class="summary-table"><thead><tr><th>القسم</th><th>الصنف</th><th style="text-align:center">الكمية</th><th>الإجمالي</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </div>
+  <div class="card">
+    <div class="total-row"><span>إجمالي قبل التعديل</span><span>${fmt(d.sub)} ج.م</span></div>
+    ${d.fin!==d.sub?`<div class="total-row"><span>بعد إضافة هامش الـ kW</span><span style="color:var(--gold)">${fmt(Math.round(d.finalBase))} ج.م</span></div>`:''}
+    ${d.disc>0?`<div class="total-row"><span>خصم</span><span style="color:var(--red)">− ${fmt(d.disc)} ج.م</span></div>`:''}
+    ${d.kw>0?`<div class="total-row"><span>سعر الكيلو واط (${d.kw.toFixed(2)} kW)</span><span style="color:var(--green)">${fmt(Math.round(d.fin/d.kw))} ج.م/kW</span></div>`:''}
+    <div class="total-row final"><span>الإجمالي النهائي للعميل</span><span>${fmt(Math.round(d.fin))} ج.م</span></div>
+  </div>
+  ${d.kw>0?`<div class="card" style="border-color:rgba(61,214,140,0.15)">
+    <div class="card-title" style="color:var(--green)"><div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#3DD68C" stroke-width="2" width="15" height="15"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></div> تحليل العائد والتوفير</div>
+    <div class="savings-grid">${[['قدرة المنظومة',d.kw.toFixed(2)+' kW'],['إنتاج شهري',fmt(Math.round(d.mp))+' kWh'],['توفير شهري',fmt(Math.round(d.ms))+' ج.م'],['استرداد الاستثمار',d.pb?d.pb.toFixed(1)+' سنة':'—'],['خفض CO₂ سنوياً','− '+(d.kw*1440*0.0005).toFixed(2)+' طن'],['توفير سنوي',fmt(Math.round(d.ms*12))+' ج.م']].map(([l,v])=>`<div class="sav-box"><div class="lbl">${l}</div><div class="val">${v}</div></div>`).join('')}</div>
+  </div>`:''}
+  <div class="card" style="border-color:rgba(76,155,255,0.15)">
+    <div class="card-title" style="color:var(--blue)"><div class="ct-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4C9BFF" stroke-width="2" width="15" height="15"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div> الضمانات المقدمة</div>
+    ${warrantyHTML()}
+  </div>
+  <div style="background:linear-gradient(135deg,rgba(16,10,0,0.8),rgba(26,16,0,0.8));border:1px solid rgba(245,200,66,0.2);border-radius:var(--r-xl);padding:16px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px;backdrop-filter:blur(12px)">
+    <div style="width:40px;height:40px;background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.2);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#F5C842" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+    <div><div style="color:var(--gold);font-weight:700;font-size:13px">مدة صلاحية العرض: 24 ساعة فقط</div><div style="color:var(--text-secondary);font-size:11.5px;margin-top:3px">العرض ساري حتى: ${esc(d.validUntil)}</div></div>
+  </div>`;
+}
+
+/* ══ PDF ══ */
+async function generatePDF(){
+  if(!lastQ){ toast('لا يوجد عرض سعر','error'); return; }
+  toast('جاري إنشاء PDF...','info');
+  const d=lastQ;
+  const rows=d.lineItems.map(li=>`<tr><td style="color:#888;font-size:9px">${esc(li.catLabel)}</td><td style="font-weight:600">${esc(li.name)}</td><td style="text-align:center">${li.qty||1}</td></tr>`).join('');
+  document.getElementById('pdfTarget').innerHTML=`
+    <div class="ph"><div style="font-size:24px;margin-bottom:4px">☀️</div><h1>${COMPANY}</h1><div class="sub">${COMPANY_EN} — SOLAR ENERGY SYSTEMS</div><div class="qt">عرض سعر — منظومة طاقة شمسية</div><div class="qm">رقم العرض: ${esc(d.quoteNo)} | التاريخ: ${esc(d.today)}</div></div>
+    <div class="pi-grid">${[['اسم العميل',d.cn],['العنوان / المشروع',d.ca],['رقم الهاتف',d.cp],['مهندس المبيعات',d.ce]].map(([l,v])=>`<div class="pi-box"><div class="l">${l}</div><div class="v">${esc(v)}</div></div>`).join('')}</div>
+    <table><thead><tr><th>القسم</th><th>الصنف / المكون</th><th style="text-align:center">الكمية</th></tr></thead><tbody>${rows}</tbody></table>
+    <div class="final-price"><div class="lbl">الإجمالي النهائي للعميل</div><div class="val">${fmt(Math.round(d.fin))} ج.م</div>${d.kw>0?`<div style="font-size:12px;opacity:0.8;margin-top:4px">⚡ ${d.kw.toFixed(2)} kW — ${fmt(Math.round(d.fin/d.kw))} ج.م/kW</div>`:''}</div>
+    <div class="warr-section"><h3>🛡️ الضمانات المقدمة</h3><div class="warr-grid">${[['☀️','الألواح الشمسية',30],['🔩','الشاسيه',10],['⚡','الإنفرتر',2],['🔌','الكابلات',5]].map(([ic,lb,yr])=>`<div class="warr-box"><div class="wi">${ic}</div><div class="wl">${lb}</div><div class="wy">${yr}</div><div class="wu">سنة ضمان</div></div>`).join('')}</div></div>
+    ${d.kw>0?`<div class="sav-section"><h3>📈 تحليل العائد والتوفير</h3><div class="sav-grid">${[['قدرة المنظومة',d.kw.toFixed(2)+' kW'],['إنتاج شهري',fmt(Math.round(d.mp))+' kWh'],['توفير شهري',fmt(Math.round(d.ms))+' ج.م'],['فترة استرداد',d.pb?d.pb.toFixed(1)+' سنة':'—'],['خفض كربون','−'+(d.kw*1440*0.0005).toFixed(2)+' طن'],['توفير سنوي',fmt(Math.round(d.ms*12))+' ج.م']].map(([l,v])=>`<div class="sav-box"><div class="l">${l}</div><div class="v">${v}</div></div>`).join('')}</div></div>`:''}
+    <div class="validity"><div class="vi">⏰</div><div class="vt"><strong>مدة صلاحية العرض: 24 ساعة فقط</strong><br/>صالح حتى: ${esc(d.validUntil)}</div></div>
+    <div class="footer">${COMPANY} — ${COMPANY_EN} | عرض رقم ${esc(d.quoteNo)} | ${esc(d.today)}<br/>جميع الأسعار والأرقام تقريبية وخاضعة للمراجعة النهائية عند التعاقد</div>`;
+  await new Promise(r=>setTimeout(r,500));
+  try {
+    const canvas=await html2canvas(document.getElementById('pdfTarget'),{scale:2,useCORS:true,backgroundColor:'#fff'});
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+    const W=pdf.internal.pageSize.getWidth(); const H=pdf.internal.pageSize.getHeight();
+    const ratio=W/canvas.width; const pageH=H/ratio;
+    let y=0; let first=true;
+    while(y<canvas.height){ if(!first) pdf.addPage(); const sl=document.createElement('canvas'); sl.width=canvas.width; sl.height=Math.min(pageH,canvas.height-y); sl.getContext('2d').drawImage(canvas,0,-y); pdf.addImage(sl.toDataURL('image/jpeg',0.95),'JPEG',0,0,W,sl.height*ratio); y+=pageH; first=false; }
+    pdf.save(`عرض-${d.cn}-${d.quoteNo}.pdf`);
+    toast('تم تحميل PDF بنجاح!','success');
+  } catch(e){ toast('خطأ في PDF: '+e.message,'error'); console.error('PDF error:',e); }
+  document.getElementById('pdfTarget').innerHTML='';
+}
+
+/* ══ SHARE ══ */
+function shareWhatsApp(){
+  if(!lastQ){ toast('لا يوجد عرض','warn'); return; }
+  const d=lastQ;
+  const items=d.lineItems.map(li=>`• ${li.name} × ${li.qty||1}`).join('\n');
+  const msg=`☀️ *${COMPANY}*\nعرض رقم: ${d.quoteNo} | ${d.today}\n\n👤 ${d.cn}\n📍 ${d.ca}\n📞 ${d.cp}\n\n📋 *مكونات المنظومة:*\n${items}\n\n${d.kw>0?`⚡ القدرة: ${d.kw.toFixed(2)} kW\n`:''}\n💰 *الإجمالي النهائي: ${fmt(Math.round(d.fin))} ج.م*\n\n🛡️ *الضمانات:* ألواح 30 سنة | شاسيه 10 | إنفرتر 2 | كابلات 5\n⏰ العرض ساري 24 ساعة فقط\n\n${COMPANY} 🌞`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+async function shareQuote(){
+  if(!lastQ){ toast('لا يوجد عرض','warn'); return; }
+  const d=lastQ;
+  const text=`${COMPANY} — عرض ${d.quoteNo}\nالعميل: ${d.cn} | ${d.ca}\n${d.kw>0?'القدرة: '+d.kw.toFixed(2)+' kW':''}\nالإجمالي: ${fmt(Math.round(d.fin))} ج.م\nساري حتى: ${d.validUntil}`;
+  if(navigator.share){ try{ await navigator.share({title:`عرض سعر - ${COMPANY}`,text}); }catch(e){} }
+  else { try{ await navigator.clipboard.writeText(text); toast('تم النسخ إلى الحافظة','success'); }catch(e){ toast('لا يمكن النسخ تلقائياً','warn'); } }
+}
+async function copyQuoteText(){
+  if(!lastQ){ toast('لا يوجد عرض','warn'); return; }
+  const d=lastQ;
+  const lines=d.lineItems.map(li=>`  • ${li.name} × ${li.qty||1}`).join('\n');
+  const text=`${COMPANY} — عرض ${d.quoteNo}\n${d.today}\nالعميل: ${d.cn} | ${d.ca}\n\nالمكونات:\n${lines}\n${d.kw>0?'\nالقدرة: '+d.kw.toFixed(2)+' kW':''}\nالإجمالي: ${fmt(Math.round(d.fin))} ج.م\nساري حتى: ${d.validUntil}`;
+  try { await navigator.clipboard.writeText(text); toast('تم نسخ العرض','success'); }
+  catch(e){ toast('لا يمكن النسخ تلقائياً','warn'); }
+}
+
+/* ══ HISTORY ══ */
+async function saveToHistory(){
+  if(!lastQ){ toast('لا يوجد عرض','warn'); return; }
+  // Check for duplicate in Supabase
+  const hist=await getHistory();
+  if(hist.find(h=>h.quoteNo===lastQ.quoteNo)){ toast('هذا العرض محفوظ مسبقاً','warn'); return; }
+  const quoteToSave={...lastQ,clientId:quotingForClientId||lastQ.clientId||null,savedAt:new Date().toLocaleString('ar-EG')};
+  try {
+    await saveQuoteToDB(quoteToSave);
+  } catch(e){ toast('خطأ في حفظ العرض','error'); console.error(e); return; }
+  // FIX: Only update lastQuoteDate if we know the client
+  if(quotingForClientId){
+    const clients=getClientsSync();
+    const idx=clients.findIndex(c=>String(c.id)===String(quotingForClientId));
+    if(idx>=0){ clients[idx].lastQuoteDate=new Date().toLocaleString('ar-EG'); saveClientsSync(clients); }
+  }
+  updateDashboardStats();
+  toast('تم الحفظ بنجاح','success');
+}
+
+async function renderHistory(){
+  const hist=await getHistory();
+  const wrap=document.getElementById('historyList');
+  if(!hist.length){ wrap.innerHTML='<div class="status-msg"><div class="s-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="28" height="28"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div><div>لا يوجد عروض محفوظة</div></div>'; return; }
+  wrap.innerHTML=hist.map((d,i)=>`
+    <div class="hist-item">
+      <div style="flex:1;min-width:130px">
+        <div style="color:var(--gold);font-weight:700;font-size:13.5px">${esc(d.cn)}</div>
+        <div style="color:var(--text-secondary);font-size:11px;margin-top:2px">${esc(d.quoteNo)} | ${esc(d.today)}</div>
+        <div style="color:var(--text-muted);font-size:10px;margin-top:2px">حُفظ: ${esc(d.savedAt)}</div>
+      </div>
+      <div style="text-align:center;min-width:80px">
+        ${d.kw>0?`<div style="color:var(--green);font-size:11px;font-weight:700">${d.kw.toFixed(2)} kW</div>`:''}
+        <div style="color:var(--gold);font-size:12px;font-weight:700;margin-top:2px">${fmt(Math.round(d.fin||0))} ج.م</div>
+        <div style="color:var(--text-secondary);font-size:10.5px;margin-top:2px">${d.lineItems?.length||0} بنود</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-primary" style="font-size:10.5px;padding:6px 11px" onclick="reloadQ(${i})">فتح</button>
+        <button class="btn btn-pdf" style="font-size:10.5px;padding:6px 11px" onclick="reloadPDF(${i})">PDF</button>
+        <button class="btn btn-wa" style="font-size:10.5px;padding:6px 11px" onclick="reloadWA(${i})">WA</button>
+        ${d.clientId?`<button class="btn btn-blue" style="font-size:10.5px;padding:6px 11px" onclick="openClientDetail('${esc(d.clientId)}')">عميل</button>`:''}
+        <button class="btn btn-danger" style="font-size:10.5px;padding:6px 11px" onclick="delH(${i})">حذف</button>
+      </div>
+    </div>`).join('');
+}
+async function reloadQ(i){ const h=await getHistory(); lastQ=h[i]; document.getElementById('summaryContent').innerHTML=buildSummaryHTML(lastQ); showPage('summary'); updateSidebarActive('summary'); }
+async function reloadPDF(i){ const h=await getHistory(); lastQ=h[i]; await generatePDF(); }
+async function reloadWA(i){ const h=await getHistory(); lastQ=h[i]; shareWhatsApp(); }
+async function delH(i){
+  if(!confirm('حذف هذا العرض؟')) return;
+  const h=await getHistory();
+  const q=h[i]; if(!q) return;
+  try{ await deleteQuoteFromDB(q.quoteNo); }catch(e){ toast('خطأ في الحذف','error'); return; }
+  renderHistory(); updateDashboardStats(); toast('تم الحذف','info');
+}
+
+/* ══ MASTER ══ */
+function renderMasterPreview(){
+  const wrap=document.getElementById('masterPreview'); if(!wrap) return; wrap.innerHTML='';
+  catOrder.forEach(k=>{
+    const c=catalog[k]; if(!c.items.length) return;
+    const div=document.createElement('div'); div.className='card';
+    div.innerHTML=`<div class="card-title"><div class="ct-icon">${getCatSVG(c.icon)}</div> ${esc(c.label)} <span style="color:var(--text-muted);font-size:11px;margin-right:4px">(${c.items.length} منتج)</span></div>
+      <div style="overflow-x:auto"><table class="master-table">
+        <thead><tr><th>المنتج</th><th style="text-align:center">المواصفة</th><th style="text-align:center">السعر</th></tr></thead>
+        <tbody>${c.items.map(it=>`<tr><td style="font-weight:600">${esc(it.name)}</td><td style="color:var(--text-secondary);text-align:center">${esc(it.spec||(it.watts?it.watts+'W':'')|| (it.kw?it.kw+' kW':'')||'—')}</td><td style="color:var(--green);font-weight:700;text-align:center">${fmt(it.price)} ج.م</td></tr>`).join('')}</tbody>
+      </table></div>`;
+    wrap.appendChild(div);
+  });
+}
+
+/* ══ TOAST ══ */
+const toastTypes={
+  success:{bg:'rgba(61,214,140,0.15)',border:'rgba(61,214,140,0.3)',color:'#3DD68C',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><polyline points="20 6 9 17 4 12"/></svg>'},
+  error:{bg:'rgba(255,82,82,0.15)',border:'rgba(255,82,82,0.3)',color:'#FF5252',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'},
+  warn:{bg:'rgba(245,200,66,0.12)',border:'rgba(245,200,66,0.3)',color:'#F5C842',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>'},
+  info:{bg:'rgba(76,155,255,0.12)',border:'rgba(76,155,255,0.3)',color:'#4C9BFF',icon:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'}
+};
+function toast(msg,type='info'){
+  const t=document.getElementById('toast'); const cfg=toastTypes[type]||toastTypes.info;
+  t.style.background=cfg.bg; t.style.borderColor=cfg.border;
+  document.getElementById('toastIcon').innerHTML=cfg.icon;
+  document.getElementById('toastIcon').style.color=cfg.color;
+  document.getElementById('toastText').textContent=msg;
+  t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),3200);
+}
+</script>
+</body>
+</html>
